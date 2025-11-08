@@ -97,4 +97,74 @@ export const clientRouter = router({
 
       return { client };
     }),
+
+  // Delete a client (cascade deletes relations)
+  delete: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      await db.client.delete({
+        where: { id: input.id },
+      });
+
+      return { success: true };
+    }),
+
+  // Add marketing material
+  addMarketingMaterial: publicProcedure
+    .input(
+      z.object({
+        clientId: z.string(),
+        url: z.string().url('Must be a valid URL'),
+        title: z.string().min(1, 'Title is required'),
+        description: z.string().optional(),
+        assetType: z.string().min(1, 'Asset type is required'),
+        previewImageUrl: z.string().url().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const material = await db.marketingMaterial.create({
+        data: input,
+      });
+
+      return { material };
+    }),
+
+  // Delete marketing material
+  deleteMarketingMaterial: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      await db.marketingMaterial.delete({
+        where: { id: input.id },
+      });
+
+      return { success: true };
+    }),
+
+  // Add branding asset
+  addBrandingAsset: publicProcedure
+    .input(
+      z.object({
+        clientId: z.string(),
+        url: z.string().url('Must be a valid URL'),
+        assetType: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const asset = await db.logoAndBranding.create({
+        data: input,
+      });
+
+      return { asset };
+    }),
+
+  // Delete branding asset
+  deleteBrandingAsset: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      await db.logoAndBranding.delete({
+        where: { id: input.id },
+      });
+
+      return { success: true };
+    }),
 });
