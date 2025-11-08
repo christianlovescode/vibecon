@@ -11,7 +11,11 @@ import {
   Dialog,
   TextArea,
   Card,
+  Badge,
+  IconButton,
+  Tooltip,
 } from "@radix-ui/themes";
+import { LightningBoltIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
@@ -19,10 +23,27 @@ import { useRouter } from "next/navigation";
 
 export default function ClientsPage() {
   const router = useRouter();
-  const { data, isLoading, error } = trpc.client.list.useQuery();
+  const { data, isLoading, error, refetch } = trpc.client.list.useQuery(
+    undefined,
+    {
+      refetchInterval: (query) => {
+        // Auto-refetch every 5 seconds if any client is enriching
+        const hasEnriching = query.state.data?.clients.some(
+          (c) => c.enrichmentStatus === "enriching" || c.enrichmentStatus === "pending"
+        );
+        return hasEnriching ? 5000 : false;
+      },
+    }
+  );
   const createMutation = trpc.client.create.useMutation();
+  const enrichMutation = trpc.client.enrichClient.useMutation();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEnrichDialogOpen, setIsEnrichDialogOpen] = useState(false);
+  const [enrichFormData, setEnrichFormData] = useState({
+    name: "",
+    domain: "",
+  });
   const [formData, setFormData] = useState({
     name: "",
     website: "",
@@ -48,6 +69,13 @@ export default function ClientsPage() {
       headcount: "",
       linkedinUrl: "",
       twitterUrl: "",
+    });
+  };
+
+  const resetEnrichForm = () => {
+    setEnrichFormData({
+      name: "",
+      domain: "",
     });
   };
 
@@ -77,6 +105,46 @@ export default function ClientsPage() {
       alert("Failed to create client");
       console.error(err);
     }
+  };
+
+  const handleEnrich = async () => {
+    try {
+      const result = await enrichMutation.mutateAsync({
+        name: enrichFormData.name,
+        domain: enrichFormData.domain,
+      });
+
+      setIsEnrichDialogOpen(false);
+      resetEnrichForm();
+      
+      // Refetch to show the new client
+      refetch();
+
+      // Navigate to the newly created client
+      router.push(`/clients/${result.client.id}`);
+    } catch (err) {
+      alert("Failed to start enrichment");
+      console.error(err);
+    }
+  };
+
+  const getEnrichmentBadge = (status: string | null) => {
+    if (!status || status === "completed") return null;
+
+    const badgeProps = {
+      pending: { color: "gray" as const, text: "Queued" },
+      enriching: { color: "blue" as const, text: "Enriching..." },
+      failed: { color: "red" as const, text: "Failed" },
+    };
+
+    const props = badgeProps[status as keyof typeof badgeProps];
+    if (!props) return null;
+
+    return (
+      <Badge color={props.color} size="1" data-testid={`enrichment-badge-${status}`}>
+        {props.text}
+      </Badge>
+    );
   };
 
   return (
