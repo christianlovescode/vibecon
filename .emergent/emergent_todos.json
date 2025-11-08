@@ -9,11 +9,11 @@
   },
   {
     "content": "Register client router in _app.ts",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Update app/layout.tsx with Radix Theme settings (accentColor=teal, grayColor=slate)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Append design tokens to app/globals.css",
