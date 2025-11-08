@@ -498,6 +498,7 @@ export default function ClientsPage() {
             <Table.Row>
               <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Website</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Created</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
             </Table.Row>
@@ -532,6 +533,9 @@ export default function ClientsPage() {
                   ) : (
                     <Text color="gray">—</Text>
                   )}
+                </Table.Cell>
+                <Table.Cell>
+                  {getEnrichmentBadge(client.enrichmentStatus)}
                 </Table.Cell>
                 <Table.Cell>
                   <Text size="2" color="gray">
