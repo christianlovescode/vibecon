@@ -25,10 +25,10 @@
   },
   {
     "content": "Create app/clients/[id]/page.tsx - client detail with all fields and related tables",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Test the application manually with screenshots and verify functionality",
-    "status": "pending"
+    "status": "in_progress"
   }
 ]
