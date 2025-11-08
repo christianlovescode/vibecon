@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Stack
 
-## Getting Started
+### Frontend 
 
-First, run the development server:
+- This is a NEXTJS site using Typescript.
+- All UI should be built using [Radix Themes](https://www.radix-ui.com/themes/docs/overview/getting-started).
+- For global state management we use [Zustand](https://zustand.docs.pmnd.rs/integrations/persisting-store-data#typescript-simple-example) - a lightweight state management for workflow state.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Database 
+- Planetscale hosted Postgres 
+- Prisma ORM 
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To generate db types, run `npx prisma generate`
+Pushing db changes run `npx prisma db push`
+To view data run `npx prisma studio`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Data fetching 
 
-To learn more about Next.js, take a look at the following resources:
+We use tRPC.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+trpc/
+├── init.ts              # tRPC initialization with superjson transformer
+├── client.ts            # React client setup
+├── Provider.tsx         # React Query provider for Next.js App Router
+├── README.md            # Documentation for adding new routers
+└── routers/
+    ├── _app.ts          # Main router combining all sub-routers
+    ├── foo.ts           # Example router with greeting, items, and create mutation
+    └── bar.ts           # Example router with stats, user lookup, and status update
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+app/api/trpc/[trpc]/
+└── route.ts             # API route handler
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Background workers 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+We use trigger.dev. 
+
+
+## Asset generation
+
+https://v0.app/docs/api/platform/quickstart
+
