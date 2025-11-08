@@ -94,4 +94,19 @@ model LogoAndBranding {
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("logos_and_branding")
+
+
+model Lead {
+  id              String   @id @default(uuid())
+  clientId        String   @map("client_id")
+  linkedinSlug    String   @map("linkedin_slug")
+  enrichmentData  Json?    @map("enrichment_data") // Stores unstructured enrichment data as JSON blob
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("leads")
+}
+
 }
