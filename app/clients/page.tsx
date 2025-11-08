@@ -173,6 +173,86 @@ export default function ClientsPage() {
               variant="classic"
             />
           </div>
+          <Tooltip content="AI-powered enrichment">
+            <Dialog.Root
+              open={isEnrichDialogOpen}
+              onOpenChange={setIsEnrichDialogOpen}
+            >
+              <Dialog.Trigger>
+                <IconButton
+                  data-testid="enrich-client-button"
+                  size="2"
+                  variant="soft"
+                  color="violet"
+                >
+                  <LightningBoltIcon width="16" height="16" />
+                </IconButton>
+              </Dialog.Trigger>
+
+              <Dialog.Content maxWidth="500px">
+                <Dialog.Title>AI-Powered Client Enrichment</Dialog.Title>
+                <Dialog.Description size="2" mb="4">
+                  Enter basic info and let AI research and enrich the client profile automatically.
+                </Dialog.Description>
+
+                <div className="space-y-4">
+                  <Box>
+                    <Text size="2" weight="medium" className="block mb-2">
+                      Company Name <Text color="red">*</Text>
+                    </Text>
+                    <TextField.Root
+                      data-testid="enrich-field-name"
+                      placeholder="e.g., Acme Corp"
+                      value={enrichFormData.name}
+                      onChange={(e) =>
+                        setEnrichFormData({ ...enrichFormData, name: e.target.value })
+                      }
+                    />
+                  </Box>
+
+                  <Box>
+                    <Text size="2" weight="medium" className="block mb-2">
+                      Domain <Text color="red">*</Text>
+                    </Text>
+                    <TextField.Root
+                      data-testid="enrich-field-domain"
+                      placeholder="e.g., acme.com"
+                      value={enrichFormData.domain}
+                      onChange={(e) =>
+                        setEnrichFormData({ ...enrichFormData, domain: e.target.value })
+                      }
+                    />
+                  </Box>
+
+                  <Box className="bg-[var(--accent-2)] rounded-md p-3">
+                    <Text size="1" color="gray">
+                      <strong>AI will research:</strong> Industry, summary, target customers, value proposition, location, headcount, social links, branding assets, marketing materials, and testimonials.
+                    </Text>
+                  </Box>
+                </div>
+
+                <Flex gap="3" mt="4" justify="end">
+                  <Dialog.Close>
+                    <Button
+                      variant="soft"
+                      color="gray"
+                      data-testid="enrich-cancel-button"
+                    >
+                      Cancel
+                    </Button>
+                  </Dialog.Close>
+                  <Button
+                    onClick={handleEnrich}
+                    disabled={!enrichFormData.name || !enrichFormData.domain || enrichMutation.isPending}
+                    data-testid="enrich-submit-button"
+                    color="violet"
+                  >
+                    {enrichMutation.isPending ? "Starting..." : "Start Enrichment"}
+                  </Button>
+                </Flex>
+              </Dialog.Content>
+            </Dialog.Root>
+          </Tooltip>
           <Dialog.Root
             open={isCreateDialogOpen}
             onOpenChange={setIsCreateDialogOpen}
