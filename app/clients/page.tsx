@@ -15,7 +15,7 @@ import {
   IconButton,
   Tooltip,
 } from "@radix-ui/themes";
-import { LightningBoltIcon } from "@radix-ui/react-icons";
+import { Zap } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
@@ -29,7 +29,9 @@ export default function ClientsPage() {
       refetchInterval: (query) => {
         // Auto-refetch every 5 seconds if any client is enriching
         const hasEnriching = query.state.data?.clients.some(
-          (c) => c.enrichmentStatus === "enriching" || c.enrichmentStatus === "pending"
+          (c) =>
+            c.enrichmentStatus === "enriching" ||
+            c.enrichmentStatus === "pending"
         );
         return hasEnriching ? 5000 : false;
       },
@@ -116,7 +118,7 @@ export default function ClientsPage() {
 
       setIsEnrichDialogOpen(false);
       resetEnrichForm();
-      
+
       // Refetch to show the new client
       refetch();
 
@@ -141,7 +143,11 @@ export default function ClientsPage() {
     if (!props) return null;
 
     return (
-      <Badge color={props.color} size="1" data-testid={`enrichment-badge-${status}`}>
+      <Badge
+        color={props.color}
+        size="1"
+        data-testid={`enrichment-badge-${status}`}
+      >
         {props.text}
       </Badge>
     );
@@ -179,20 +185,16 @@ export default function ClientsPage() {
               onOpenChange={setIsEnrichDialogOpen}
             >
               <Dialog.Trigger>
-                <IconButton
-                  data-testid="enrich-client-button"
-                  size="2"
-                  variant="soft"
-                  color="violet"
-                >
-                  <LightningBoltIcon width="16" height="16" />
+                <IconButton size="2" variant="soft">
+                  <Zap width="16" height="16" />
                 </IconButton>
               </Dialog.Trigger>
 
               <Dialog.Content maxWidth="500px">
                 <Dialog.Title>AI-Powered Client Enrichment</Dialog.Title>
                 <Dialog.Description size="2" mb="4">
-                  Enter basic info and let AI research and enrich the client profile automatically.
+                  Enter basic info and let AI research and enrich the client
+                  profile automatically.
                 </Dialog.Description>
 
                 <div className="space-y-4">
@@ -205,7 +207,10 @@ export default function ClientsPage() {
                       placeholder="e.g., Acme Corp"
                       value={enrichFormData.name}
                       onChange={(e) =>
-                        setEnrichFormData({ ...enrichFormData, name: e.target.value })
+                        setEnrichFormData({
+                          ...enrichFormData,
+                          name: e.target.value,
+                        })
                       }
                     />
                   </Box>
@@ -219,14 +224,20 @@ export default function ClientsPage() {
                       placeholder="e.g., acme.com"
                       value={enrichFormData.domain}
                       onChange={(e) =>
-                        setEnrichFormData({ ...enrichFormData, domain: e.target.value })
+                        setEnrichFormData({
+                          ...enrichFormData,
+                          domain: e.target.value,
+                        })
                       }
                     />
                   </Box>
 
                   <Box className="bg-[var(--accent-2)] rounded-md p-3">
                     <Text size="1" color="gray">
-                      <strong>AI will research:</strong> Industry, summary, target customers, value proposition, location, headcount, social links, branding assets, marketing materials, and testimonials.
+                      <strong>AI will research:</strong> Industry, summary,
+                      target customers, value proposition, location, headcount,
+                      social links, branding assets, marketing materials, and
+                      testimonials.
                     </Text>
                   </Box>
                 </div>
@@ -243,11 +254,17 @@ export default function ClientsPage() {
                   </Dialog.Close>
                   <Button
                     onClick={handleEnrich}
-                    disabled={!enrichFormData.name || !enrichFormData.domain || enrichMutation.isPending}
+                    disabled={
+                      !enrichFormData.name ||
+                      !enrichFormData.domain ||
+                      enrichMutation.isPending
+                    }
                     data-testid="enrich-submit-button"
                     color="violet"
                   >
-                    {enrichMutation.isPending ? "Starting..." : "Start Enrichment"}
+                    {enrichMutation.isPending
+                      ? "Starting..."
+                      : "Start Enrichment"}
                   </Button>
                 </Flex>
               </Dialog.Content>

@@ -1,16 +1,11 @@
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { anthropic } from "@ai-sdk/anthropic";
-import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, generateObject } from "ai";
 import { z } from "zod";
 import { Resend } from "resend";
 import db from "@/db/client";
 
-// Initialize Perplexity via OpenAI SDK
-const perplexity = createOpenAI({
-  apiKey: process.env.PERPLEXITY_API_KEY!,
-  baseURL: "https://api.perplexity.ai/",
-});
+import { perplexity } from "@ai-sdk/perplexity";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -92,13 +87,13 @@ export const enrichClientTask = task({
 - estimated head count
 - features or services offered
 - testimonials
-- linkedin url
-- twitter url
+- company linkedin url
+- company x/twitter url
 
 Format your response as structured as possible. Every field here is important to capture, but if you're unable to just return "I couldn't find anything for <field name>".`;
 
       const companyInfoResponse = await generateText({
-        model: perplexity("llama-3.1-sonar-large-128k-online"),
+        model: perplexity("sonar-pro"),
         prompt: companyInfoPrompt,
       });
 
@@ -109,10 +104,16 @@ Format your response as structured as possible. Every field here is important to
       logger.log("Phase 2: Fetching branding assets from Perplexity");
 
       // Phase 2: Get branding assets
-      const brandingPrompt = `You are tasked with finding public links/urls to branding assets for ${name} (${domain}). Please research thoroughly and a list of links that point to their branding assets. You should capture the asset type (logo, wordmark, etc) and give a url of where it lives.`;
+      const brandingPrompt = `You are tasked with finding public links/urls to branding assets for ${name} (${domain}). Please research thoroughly and a list of links that point to their branding assets. 
+
+You should capture the asset type (logo, wordmark, etc) and give a url of where it lives.
+
+Again, we are looking for the DIRECT PUBLIC URL of the asset. Assume that it will be used as the src for an image, link href, etc. We need the actual url of the public asset please. 
+
+You should first look at the SEO meta tags for ${domain} and use and logo and icon found there first.`;
 
       const brandingResponse = await generateText({
-        model: perplexity("llama-3.1-sonar-large-128k-online"),
+        model: perplexity("sonar-pro"),
         prompt: brandingPrompt,
       });
 
@@ -123,10 +124,26 @@ Format your response as structured as possible. Every field here is important to
       logger.log("Phase 3: Fetching marketing materials from Perplexity");
 
       // Phase 3: Get marketing material
-      const marketingPrompt = `You are tasked with finding public marketing material for ${name} (${domain}). Please research thoroughly and provide a list of links that point to their marketing assets. You should capture the url, title, description, preview image url, and asset type (ie blog post, podcast, video, tweet, white paper, etc.)`;
+      const marketingPrompt = `You are tasked with finding public marketing material for ${name} (${domain}). Please research thoroughly and provide a list of links that point to their marketing assets. 
+
+You should look for assets published by ${name} at ${domain}
+
+Try to find their blog, and look at recent blog posts.
+
+Try to find their Twitter/X account, and look at recent posts.
+
+Try to find their YouTube, and look for recent videos.
+
+You should capture the url, title, description, preview image url, and asset type (ie blog post, podcast, video, tweet, white paper, etc.) all published as recent as possible.
+
+You should capture the url, title, description, preview image url, and asset type (ie blog post, podcast, video, tweet, white paper, etc.) all published as recent as possible.
+
+Note for Preview Image, you should look at the OG meta content in the webpage and use the thumbnail / image that is provided in the meta and used for SEO purposes. The preview image should be THE URL FROM THIS.
+
+`;
 
       const marketingResponse = await generateText({
-        model: perplexity("llama-3.1-sonar-large-128k-online"),
+        model: perplexity("sonar-pro"),
         prompt: marketingPrompt,
       });
 
@@ -137,24 +154,12 @@ Format your response as structured as possible. Every field here is important to
       logger.log("Phase 4: Extracting structured data with Anthropic");
 
       // Phase 4: Extract structured data using Anthropic
-      const structuredPrompt = `Extract structured data from the following research about ${name}:
-
-COMPANY INFO RESEARCH:
-${companyInfoResponse.text}
-
-BRANDING RESEARCH:
-${brandingResponse.text}
-
-MARKETING RESEARCH:
-${marketingResponse.text}
-
-Extract all the information in a structured format. For fields you can't find, return null. For lists, return empty arrays if nothing is found.`;
 
       // Extract company info and features/testimonials
       const companyData = await generateObject({
-        model: anthropic("claude-3-5-sonnet-20241022"),
+        model: anthropic("claude-sonnet-4-5"),
         schema: CompanyResearchSchema,
-        prompt: structuredPrompt,
+        prompt: `Extract structured data from the following research about ${name}: COMPANY INFO RESEARCH: ${companyInfoResponse.text}`,
       });
 
       logger.log("Company data extracted", {
@@ -164,9 +169,9 @@ Extract all the information in a structured format. For fields you can't find, r
 
       // Extract branding assets
       const brandingData = await generateObject({
-        model: anthropic("claude-3-5-sonnet-20241022"),
+        model: anthropic("claude-sonnet-4-5"),
         schema: BrandingResearchSchema,
-        prompt: structuredPrompt,
+        prompt: `Extract structured data from the following research about ${name}: BRANDING RESEARCH: ${brandingResponse.text}`,
       });
 
       logger.log("Branding data extracted", {
@@ -175,9 +180,9 @@ Extract all the information in a structured format. For fields you can't find, r
 
       // Extract marketing materials
       const marketingData = await generateObject({
-        model: anthropic("claude-3-5-sonnet-20241022"),
+        model: anthropic("claude-sonnet-4-5"),
         schema: MarketingResearchSchema,
-        prompt: structuredPrompt,
+        prompt: `Extract structured data from the following research about ${name}: MARKETING RESEARCH: ${marketingResponse.text}`,
       });
 
       logger.log("Marketing data extracted", {
@@ -260,7 +265,7 @@ Extract all the information in a structured format. For fields you can't find, r
 
       await resend.emails.send({
         from: "christian@dunbarbeta.com",
-        to: "christian@dunbarbeta.com",
+        to: "christian@getdunbar.ai",
         subject: `Client Enrichment Complete: ${name}`,
         html: `
           <h2>Client Enrichment Complete</h2>
@@ -302,7 +307,8 @@ Extract all the information in a structured format. For fields you can't find, r
         where: { id: clientId },
         data: {
           enrichmentStatus: "failed",
-          enrichmentError: error instanceof Error ? error.message : "Unknown error",
+          enrichmentError:
+            error instanceof Error ? error.message : "Unknown error",
         },
       });
 
