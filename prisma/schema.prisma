@@ -16,24 +16,38 @@ model Foo {
 }
 
 model Client {
-  id                String              @id @default(uuid())
-  name              String
-  website           String?
-  industry          String?
-  companySummary    String?             @map("company_summary")
-  targetCustomer    String?             @map("target_customer")
-  valueProposition  String?             @map("value_proposition")
-  location          String?
-  headcount         Int?
-  linkedinUrl       String?             @map("linkedin_url")
-  twitterUrl        String?             @map("twitter_url")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  
+  id               String   @id @default(uuid())
+  name             String
+  website          String?
+  industry         String?
+  companySummary   String?  @map("company_summary")
+  targetCustomer   String?  @map("target_customer")
+  valueProposition String?  @map("value_proposition")
+  location         String?
+  headcount        Int?
+  linkedinUrl      String?  @map("linkedin_url")
+  twitterUrl       String?  @map("twitter_url")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
   marketingMaterials MarketingMaterial[]
   logosAndBranding   LogoAndBranding[]
+  testimonials       Testimonial[]
+  featureOrServices  FeatureOrService[]
 
   @@map("clients")
+}
+
+model FeatureOrService {
+  id          String   @id @default(uuid())
+  clientId    String   @map("client_id")
+  title       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("feature_or_service")
 }
 
 model MarketingMaterial {
@@ -46,21 +60,35 @@ model MarketingMaterial {
   previewImageUrl String?  @map("preview_image_url")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
-  
-  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("marketing_materials")
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  clientId  String   @map("client_id")
+  name      String
+  title     String
+  quote     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("testimonial")
 }
 
 model LogoAndBranding {
   id        String   @id @default(uuid())
   clientId  String   @map("client_id")
-  url       String   // Points to publicly hosted logo, wordmark, etc.
+  url       String // Points to publicly hosted logo, wordmark, etc.
   assetType String?  @map("asset_type") // e.g., "logo", "wordmark", "icon", etc.
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  
-  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@map("logos_and_branding")
 }
