@@ -1,0 +1,34 @@
+[
+  {
+    "content": "Generate Prisma client and verify database connection",
+    "status": "pending"
+  },
+  {
+    "content": "Create tRPC client router at /app/trpc/routers/client.ts with list, byId, and update procedures",
+    "status": "pending"
+  },
+  {
+    "content": "Register client router in _app.ts",
+    "status": "pending"
+  },
+  {
+    "content": "Update app/layout.tsx with Radix Theme settings (accentColor=teal, grayColor=slate)",
+    "status": "pending"
+  },
+  {
+    "content": "Append design tokens to app/globals.css",
+    "status": "pending"
+  },
+  {
+    "content": "Create app/clients/page.tsx - clients list with table (name, website, createdAt)",
+    "status": "pending"
+  },
+  {
+    "content": "Create app/clients/[id]/page.tsx - client detail with all fields and related tables",
+    "status": "pending"
+  },
+  {
+    "content": "Test the application manually with screenshots and verify functionality",
+    "status": "pending"
+  }
+]
