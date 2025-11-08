@@ -21,11 +21,11 @@
   },
   {
     "content": "Create app/clients/page.tsx - clients list with table (name, website, createdAt)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create app/clients/[id]/page.tsx - client detail with all fields and related tables",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Test the application manually with screenshots and verify functionality",
