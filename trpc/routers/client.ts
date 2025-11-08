@@ -46,6 +46,30 @@ export const clientRouter = router({
       return { client };
     }),
 
+  // Create a new client
+  create: publicProcedure
+    .input(
+      z.object({
+        name: z.string().min(1, 'Name is required'),
+        website: z.string().optional(),
+        industry: z.string().optional(),
+        companySummary: z.string().optional(),
+        targetCustomer: z.string().optional(),
+        valueProposition: z.string().optional(),
+        location: z.string().optional(),
+        headcount: z.number().optional(),
+        linkedinUrl: z.string().optional(),
+        twitterUrl: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const client = await db.client.create({
+        data: input,
+      });
+
+      return { client };
+    }),
+
   // Update a client
   update: publicProcedure
     .input(
