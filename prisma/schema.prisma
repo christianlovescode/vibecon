@@ -36,6 +36,7 @@ model Client {
   logosAndBranding   LogoAndBranding[]
   testimonials       Testimonial[]
   featureOrServices  FeatureOrService[]
+  leads              Lead[]
 
   @@map("clients")
 }
