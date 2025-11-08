@@ -13,11 +13,11 @@
   },
   {
     "content": "Update app/layout.tsx with Radix Theme settings (accentColor=teal, grayColor=slate)",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Append design tokens to app/globals.css",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create app/clients/page.tsx - clients list with table (name, website, createdAt)",
