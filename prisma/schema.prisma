@@ -103,6 +103,7 @@ model Lead {
   enrichmentData Json?    @map("enrichment_data") // Stores unstructured enrichment data as JSON blob
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
+  enrichmentStatus String?  @default("completed") @map("enrichment_status") // pending, enriching, completed, failed
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
