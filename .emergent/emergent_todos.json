@@ -5,11 +5,11 @@
   },
   {
     "content": "Create tRPC client router at /app/trpc/routers/client.ts with list, byId, and update procedures",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Register client router in _app.ts",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Update app/layout.tsx with Radix Theme settings (accentColor=teal, grayColor=slate)",
