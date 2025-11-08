@@ -11,6 +11,7 @@ export const leadRouter = router({
         id: true,
         linkedinSlug: true,
         enrichmentData: true,
+        enrichmentStatus: true,
         createdAt: true,
         updatedAt: true,
         client: {
@@ -54,7 +55,7 @@ export const leadRouter = router({
             data: {
               clientId,
               linkedinSlug: url, // Store full URL as per user requirement
-              enrichmentData: null, // null indicates enriching
+              enrichmentData: undefined, // null indicates enriching
             },
           });
           return lead;

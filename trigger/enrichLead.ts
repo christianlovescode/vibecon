@@ -13,7 +13,9 @@ export const enrichLeadTask = task({
 
       // Call ProAPIs service to enrich the LinkedIn profile
       const proAPIsService = new ProAPIsService();
-      const enrichmentData = await proAPIsService.enrichLinkedinUrl(linkedinUrl);
+      const enrichmentData = await proAPIsService.enrichLinkedinUrl(
+        linkedinUrl
+      );
 
       logger.log("Enrichment data received", {
         leadId,
@@ -24,7 +26,9 @@ export const enrichLeadTask = task({
       await db.lead.update({
         where: { id: leadId },
         data: {
-          enrichmentData: enrichmentData as any, // Store as JSON
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          enrichmentData: enrichmentData as any,
+          enrichmentStatus: "completed",
         },
       });
 
@@ -39,6 +43,13 @@ export const enrichLeadTask = task({
 
       // For hackathon purposes, we just log the error and don't update status
       // The lead will remain with null enrichmentData (ENRICHING state)
+
+      await db.lead.update({
+        where: { id: leadId },
+        data: {
+          enrichmentStatus: "failed",
+        },
+      });
 
       throw error;
     }

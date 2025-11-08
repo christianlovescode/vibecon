@@ -24,18 +24,20 @@ export default function LeadsPage() {
   const { data: clientsData } = trpc.client.list.useQuery();
 
   // Fetch leads with auto-refresh when enriching
-  const { data: leadsData, isLoading, error, refetch } = trpc.lead.list.useQuery(
-    undefined,
-    {
-      refetchInterval: (query) => {
-        // Auto-refetch every 5 seconds if any lead is enriching
-        const hasEnriching = query.state.data?.leads.some(
-          (lead) => lead.enrichmentData === null
-        );
-        return hasEnriching ? 5000 : false;
-      },
-    }
-  );
+  const {
+    data: leadsData,
+    isLoading,
+    error,
+    refetch,
+  } = trpc.lead.list.useQuery(undefined, {
+    refetchInterval: (query) => {
+      // Auto-refetch every 5 seconds if any lead is enriching
+      const hasEnriching = query.state.data?.leads.some(
+        (lead) => lead.enrichmentData === null
+      );
+      return hasEnriching ? 5000 : false;
+    },
+  });
 
   const createBulkMutation = trpc.lead.createBulk.useMutation();
 
@@ -66,7 +68,9 @@ export default function LeadsPage() {
       }
 
       // Validate URLs are LinkedIn URLs
-      const invalidUrls = urls.filter((url) => !url.includes("linkedin.com/in/"));
+      const invalidUrls = urls.filter(
+        (url) => !url.includes("linkedin.com/in/")
+      );
       if (invalidUrls.length > 0) {
         alert(`Invalid LinkedIn URLs found:\n${invalidUrls.join("\n")}`);
         setIsSubmitting(false);
@@ -90,14 +94,29 @@ export default function LeadsPage() {
     }
   };
 
-  const getStatusBadge = (lead: { enrichmentData: any }) => {
-    if (lead.enrichmentData === null) {
+  const getStatusBadge = (status: string) => {
+    if (status === "enriching") {
       return (
         <Badge color="blue" size="1" data-testid="status-enriching">
           ENRICHING
         </Badge>
       );
     }
+    if (status === "completed") {
+      return (
+        <Badge color="green" size="1" data-testid="status-completed">
+          COMPLETED
+        </Badge>
+      );
+    }
+    if (status === "failed") {
+      return (
+        <Badge color="red" size="1" data-testid="status-failed">
+          FAILED
+        </Badge>
+      );
+    }
+
     return (
       <Badge color="green" size="1" data-testid="status-completed">
         COMPLETED
@@ -164,7 +183,8 @@ export default function LeadsPage() {
               LinkedIn URLs <Text color="red">*</Text>
             </Text>
             <Text size="1" color="gray" className="block mb-2">
-              Paste one LinkedIn profile URL per line (e.g., https://linkedin.com/in/john-doe)
+              Paste one LinkedIn profile URL per line (e.g.,
+              https://linkedin.com/in/john-doe)
             </Text>
             <TextArea
               data-testid="linkedin-urls-textarea"
@@ -179,7 +199,9 @@ export default function LeadsPage() {
           <Flex gap="3" justify="end">
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || !selectedClientId || !linkedinUrls.trim()}
+              disabled={
+                isSubmitting || !selectedClientId || !linkedinUrls.trim()
+              }
               data-testid="submit-leads-button"
               size="3"
             >
@@ -248,7 +270,9 @@ export default function LeadsPage() {
                       {lead.linkedinSlug}
                     </a>
                   </Table.Cell>
-                  <Table.Cell>{getStatusBadge(lead)}</Table.Cell>
+                  <Table.Cell>
+                    {getStatusBadge(lead.enrichmentStatus ?? "completed")}
+                  </Table.Cell>
                   <Table.Cell>
                     <Text size="2" color="gray">
                       {new Date(lead.createdAt).toLocaleDateString("en-US", {

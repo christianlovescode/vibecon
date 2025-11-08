@@ -42,19 +42,5 @@ next-env.d.ts
 
 /app/generated/prisma
 
-.trigger-e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+
+.trigger/
