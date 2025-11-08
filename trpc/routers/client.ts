@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../init';
 import db from '@/db/client';
+import { tasks } from "@trigger.dev/sdk/v3";
 
 export const clientRouter = router({
   // Get all clients with basic info
@@ -11,6 +12,7 @@ export const clientRouter = router({
         name: true,
         website: true,
         createdAt: true,
+        enrichmentStatus: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -166,5 +168,34 @@ export const clientRouter = router({
       });
 
       return { success: true };
+    }),
+
+  // Enrich client with automated workflow
+  enrichClient: publicProcedure
+    .input(
+      z.object({
+        name: z.string().min(1, 'Name is required'),
+        domain: z.string().min(1, 'Domain is required'),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Create client with minimal data and enriching status
+      const client = await db.client.create({
+        data: {
+          name: input.name,
+          website: input.domain,
+          enrichmentStatus: "pending",
+        },
+      });
+
+      // Trigger enrichment workflow
+      const { enrichClientTask } = await import("@/trigger/enrichClient");
+      await tasks.trigger(enrichClientTask.id, {
+        clientId: client.id,
+        name: input.name,
+        domain: input.domain,
+      });
+
+      return { client };
     }),
 });

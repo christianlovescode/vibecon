@@ -11,7 +11,11 @@ import {
   Dialog,
   TextArea,
   Card,
+  Badge,
+  IconButton,
+  Tooltip,
 } from "@radix-ui/themes";
+import { Zap } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
@@ -19,10 +23,29 @@ import { useRouter } from "next/navigation";
 
 export default function ClientsPage() {
   const router = useRouter();
-  const { data, isLoading, error } = trpc.client.list.useQuery();
+  const { data, isLoading, error, refetch } = trpc.client.list.useQuery(
+    undefined,
+    {
+      refetchInterval: (query) => {
+        // Auto-refetch every 5 seconds if any client is enriching
+        const hasEnriching = query.state.data?.clients.some(
+          (c) =>
+            c.enrichmentStatus === "enriching" ||
+            c.enrichmentStatus === "pending"
+        );
+        return hasEnriching ? 5000 : false;
+      },
+    }
+  );
   const createMutation = trpc.client.create.useMutation();
+  const enrichMutation = trpc.client.enrichClient.useMutation();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEnrichDialogOpen, setIsEnrichDialogOpen] = useState(false);
+  const [enrichFormData, setEnrichFormData] = useState({
+    name: "",
+    domain: "",
+  });
   const [formData, setFormData] = useState({
     name: "",
     website: "",
@@ -48,6 +71,13 @@ export default function ClientsPage() {
       headcount: "",
       linkedinUrl: "",
       twitterUrl: "",
+    });
+  };
+
+  const resetEnrichForm = () => {
+    setEnrichFormData({
+      name: "",
+      domain: "",
     });
   };
 
@@ -79,6 +109,50 @@ export default function ClientsPage() {
     }
   };
 
+  const handleEnrich = async () => {
+    try {
+      const result = await enrichMutation.mutateAsync({
+        name: enrichFormData.name,
+        domain: enrichFormData.domain,
+      });
+
+      setIsEnrichDialogOpen(false);
+      resetEnrichForm();
+
+      // Refetch to show the new client
+      refetch();
+
+      // Navigate to the newly created client
+      router.push(`/clients/${result.client.id}`);
+    } catch (err) {
+      alert("Failed to start enrichment");
+      console.error(err);
+    }
+  };
+
+  const getEnrichmentBadge = (status: string | null) => {
+    if (!status || status === "completed") return null;
+
+    const badgeProps = {
+      pending: { color: "gray" as const, text: "Queued" },
+      enriching: { color: "blue" as const, text: "Enriching..." },
+      failed: { color: "red" as const, text: "Failed" },
+    };
+
+    const props = badgeProps[status as keyof typeof badgeProps];
+    if (!props) return null;
+
+    return (
+      <Badge
+        color={props.color}
+        size="1"
+        data-testid={`enrichment-badge-${status}`}
+      >
+        {props.text}
+      </Badge>
+    );
+  };
+
   return (
     <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <Flex
@@ -105,6 +179,97 @@ export default function ClientsPage() {
               variant="classic"
             />
           </div>
+          <Tooltip content="AI-powered enrichment">
+            <Dialog.Root
+              open={isEnrichDialogOpen}
+              onOpenChange={setIsEnrichDialogOpen}
+            >
+              <Dialog.Trigger>
+                <IconButton size="2" variant="soft">
+                  <Zap width="16" height="16" />
+                </IconButton>
+              </Dialog.Trigger>
+
+              <Dialog.Content maxWidth="500px">
+                <Dialog.Title>AI-Powered Client Enrichment</Dialog.Title>
+                <Dialog.Description size="2" mb="4">
+                  Enter basic info and let AI research and enrich the client
+                  profile automatically.
+                </Dialog.Description>
+
+                <div className="space-y-4">
+                  <Box>
+                    <Text size="2" weight="medium" className="block mb-2">
+                      Company Name <Text color="red">*</Text>
+                    </Text>
+                    <TextField.Root
+                      data-testid="enrich-field-name"
+                      placeholder="e.g., Acme Corp"
+                      value={enrichFormData.name}
+                      onChange={(e) =>
+                        setEnrichFormData({
+                          ...enrichFormData,
+                          name: e.target.value,
+                        })
+                      }
+                    />
+                  </Box>
+
+                  <Box>
+                    <Text size="2" weight="medium" className="block mb-2">
+                      Domain <Text color="red">*</Text>
+                    </Text>
+                    <TextField.Root
+                      data-testid="enrich-field-domain"
+                      placeholder="e.g., acme.com"
+                      value={enrichFormData.domain}
+                      onChange={(e) =>
+                        setEnrichFormData({
+                          ...enrichFormData,
+                          domain: e.target.value,
+                        })
+                      }
+                    />
+                  </Box>
+
+                  <Box className="bg-[var(--accent-2)] rounded-md p-3">
+                    <Text size="1" color="gray">
+                      <strong>AI will research:</strong> Industry, summary,
+                      target customers, value proposition, location, headcount,
+                      social links, branding assets, marketing materials, and
+                      testimonials.
+                    </Text>
+                  </Box>
+                </div>
+
+                <Flex gap="3" mt="4" justify="end">
+                  <Dialog.Close>
+                    <Button
+                      variant="soft"
+                      color="gray"
+                      data-testid="enrich-cancel-button"
+                    >
+                      Cancel
+                    </Button>
+                  </Dialog.Close>
+                  <Button
+                    onClick={handleEnrich}
+                    disabled={
+                      !enrichFormData.name ||
+                      !enrichFormData.domain ||
+                      enrichMutation.isPending
+                    }
+                    data-testid="enrich-submit-button"
+                    color="violet"
+                  >
+                    {enrichMutation.isPending
+                      ? "Starting..."
+                      : "Start Enrichment"}
+                  </Button>
+                </Flex>
+              </Dialog.Content>
+            </Dialog.Root>
+          </Tooltip>
           <Dialog.Root
             open={isCreateDialogOpen}
             onOpenChange={setIsCreateDialogOpen}
@@ -350,6 +515,7 @@ export default function ClientsPage() {
             <Table.Row>
               <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Website</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Created</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
             </Table.Row>
@@ -384,6 +550,9 @@ export default function ClientsPage() {
                   ) : (
                     <Text color="gray">—</Text>
                   )}
+                </Table.Cell>
+                <Table.Cell>
+                  {getEnrichmentBadge(client.enrichmentStatus)}
                 </Table.Cell>
                 <Table.Cell>
                   <Text size="2" color="gray">

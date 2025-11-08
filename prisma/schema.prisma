@@ -16,19 +16,21 @@ model Foo {
 }
 
 model Client {
-  id               String   @id @default(uuid())
-  name             String
-  website          String?
-  industry         String?
-  companySummary   String?  @map("company_summary")
-  targetCustomer   String?  @map("target_customer")
-  valueProposition String?  @map("value_proposition")
-  location         String?
-  headcount        Int?
-  linkedinUrl      String?  @map("linkedin_url")
-  twitterUrl       String?  @map("twitter_url")
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  id                String   @id @default(uuid())
+  name              String
+  website           String?
+  industry          String?
+  companySummary    String?  @map("company_summary")
+  targetCustomer    String?  @map("target_customer")
+  valueProposition  String?  @map("value_proposition")
+  location          String?
+  headcount         Int?
+  linkedinUrl       String?  @map("linkedin_url")
+  twitterUrl        String?  @map("twitter_url")
+  enrichmentStatus  String?  @default("completed") @map("enrichment_status") // pending, enriching, completed, failed
+  enrichmentError   String?  @map("enrichment_error")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
 
   marketingMaterials MarketingMaterial[]
   logosAndBranding   LogoAndBranding[]
