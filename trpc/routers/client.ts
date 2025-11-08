@@ -168,4 +168,33 @@ export const clientRouter = router({
 
       return { success: true };
     }),
+
+  // Enrich client with automated workflow
+  enrichClient: publicProcedure
+    .input(
+      z.object({
+        name: z.string().min(1, 'Name is required'),
+        domain: z.string().min(1, 'Domain is required'),
+      })
+    )
+    .mutation(async ({ input }) => {
+      // Create client with minimal data and enriching status
+      const client = await db.client.create({
+        data: {
+          name: input.name,
+          website: input.domain,
+          enrichmentStatus: "pending",
+        },
+      });
+
+      // Trigger enrichment workflow
+      const { enrichClientTask } = await import("@/trigger/enrichClient");
+      await tasks.trigger(enrichClientTask.id, {
+        clientId: client.id,
+        name: input.name,
+        domain: input.domain,
+      });
+
+      return { client };
+    }),
 });
