@@ -95,6 +95,7 @@ model LogoAndBranding {
 
   @@map("logos_and_branding")
 }
+
 model Lead {
   id              String   @id @default(uuid())
   clientId        String   @map("client_id")
