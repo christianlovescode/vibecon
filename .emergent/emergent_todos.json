@@ -17,11 +17,11 @@
   },
   {
     "content": "Append design tokens to app/globals.css",
-    "status": "in_progress"
+    "status": "completed"
   },
   {
     "content": "Create app/clients/page.tsx - clients list with table (name, website, createdAt)",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create app/clients/[id]/page.tsx - client detail with all fields and related tables",
