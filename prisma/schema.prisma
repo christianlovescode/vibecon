@@ -14,3 +14,52 @@ model Foo {
   id   Int     @id @default(autoincrement())
   name String?
 }
+
+model Client {
+  id                String              @id @default(uuid())
+  name              String
+  website           String?
+  industry          String?
+  companySummary    String?             @map("company_summary")
+  targetCustomer    String?             @map("target_customer")
+  valueProposition  String?             @map("value_proposition")
+  location          String?
+  headcount         Int?
+  linkedinUrl       String?             @map("linkedin_url")
+  twitterUrl        String?             @map("twitter_url")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  
+  marketingMaterials MarketingMaterial[]
+  logosAndBranding   LogoAndBranding[]
+
+  @@map("clients")
+}
+
+model MarketingMaterial {
+  id              String   @id @default(uuid())
+  clientId        String   @map("client_id")
+  url             String
+  title           String
+  assetType       String   @map("asset_type") // e.g., "blog_post", "youtube_video", "case_study", etc.
+  previewImageUrl String?  @map("preview_image_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  client          Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("marketing_materials")
+}
+
+model LogoAndBranding {
+  id        String   @id @default(uuid())
+  clientId  String   @map("client_id")
+  url       String   // Points to publicly hosted logo, wordmark, etc.
+  assetType String?  @map("asset_type") // e.g., "logo", "wordmark", "icon", etc.
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("logos_and_branding")
+}
