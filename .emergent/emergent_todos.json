@@ -1,7 +1,7 @@
 [
   {
     "content": "Generate Prisma client and verify database connection",
-    "status": "pending"
+    "status": "in_progress"
   },
   {
     "content": "Create tRPC client router at /app/trpc/routers/client.ts with list, byId, and update procedures",
