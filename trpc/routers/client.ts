@@ -12,6 +12,7 @@ export const clientRouter = router({
         name: true,
         website: true,
         createdAt: true,
+        enrichmentStatus: true,
       },
       orderBy: {
         createdAt: 'desc',
