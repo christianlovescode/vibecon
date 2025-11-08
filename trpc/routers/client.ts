@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../init';
 import db from '@/db/client';
+import { tasks } from "@trigger.dev/sdk/v3";
 
 export const clientRouter = router({
   // Get all clients with basic info
