@@ -114,16 +114,22 @@ export const leadRouter = router({
         })
       );
 
-      // Trigger orchestrator tasks for each lead
+      // Trigger orchestrator tasks for each lead and store run IDs
       const { orchestrateLeadTask } = await import("@/trigger/orchestrateLead");
       
       await Promise.all(
         createdLeads.map(async (lead) => {
-          await tasks.trigger(orchestrateLeadTask.id, {
+          const handle = await tasks.trigger(orchestrateLeadTask.id, {
             leadId: lead.id,
             linkedinUrl: lead.linkedinSlug,
             generateEmails,
             generateOnePager,
+          });
+          
+          // Store the run ID in the lead for real-time tracking
+          await db.lead.update({
+            where: { id: lead.id },
+            data: { triggerRunId: handle.id },
           });
         })
       );

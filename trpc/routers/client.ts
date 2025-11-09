@@ -13,6 +13,12 @@ export const clientRouter = router({
         website: true,
         createdAt: true,
         enrichmentStatus: true,
+        industry: true,
+        _count: {
+          select: {
+            leads: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',

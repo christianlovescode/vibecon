@@ -114,6 +114,7 @@ model Lead {
   enrichmentData   Json?    @map("enrichment_data") // Stores unstructured enrichment data as JSON blob
   lastStep         String?  @map("last_step") // enrichment_started, enrichment_completed, enrichment_failed, research_started, research_completed, research_failed
   researchResult   String?  @map("research_result") @db.Text // Stores the markdown research report
+  triggerRunId     String?  @map("trigger_run_id") // Stores the Trigger.dev run ID for real-time tracking
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
   enrichmentStatus String?  @default("completed") @map("enrichment_status") // pending, enriching, completed, failed

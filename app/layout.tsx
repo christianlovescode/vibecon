@@ -40,15 +40,16 @@ export default function RootLayout({
             radius="medium"
             scaling="100%"
           >
-            <div className="bg-[#FAF7F2] min-h-screen">
-              <div className="w-full h-full border border-dashed border-red-600 flex">
-                <nav className="h-screen fixed bg-[#1664d9] left-0 top-0 w-24 flex flex-col items-center justify-center">
+            {children}
+            {/* <div className="bg-[#FAF7F2] min-h-screen">
+              <div className="w-full h-full flex">
+                <nav className="h-screen fixed bg-[#111] left-0 top-0 w-24 flex flex-col items-center justify-center">
                   <Users className="text-white w-6 h-6" />
                   <Workflow className="text-white w-6 h-6" />
                 </nav>
                 <main className="flex-1 h-full ml-24"> {children}</main>
               </div>
-            </div>
+            </div> */}
           </Theme>
         </TRPCProvider>
       </body>

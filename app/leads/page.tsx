@@ -8,10 +8,8 @@ import {
   Text,
   Button,
   Card,
-  TextArea,
   Select,
   Badge,
-  Checkbox,
 } from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
@@ -20,11 +18,6 @@ import Image from "next/image";
 
 export default function LeadsPage() {
   const router = useRouter();
-  const [selectedClientId, setSelectedClientId] = useState<string>("");
-  const [linkedinUrls, setLinkedinUrls] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [generateEmails, setGenerateEmails] = useState<boolean>(true);
-  const [generateOnePager, setGenerateOnePager] = useState<boolean>(true);
   const [exportClientId, setExportClientId] = useState<string>("");
   const [isExporting, setIsExporting] = useState(false);
 
@@ -36,7 +29,6 @@ export default function LeadsPage() {
     data: leadsData,
     isLoading,
     error,
-    refetch,
   } = trpc.lead.list.useQuery(undefined, {
     refetchInterval: (query) => {
       // Auto-refetch every 5 seconds if any lead is still processing
@@ -50,7 +42,6 @@ export default function LeadsPage() {
     },
   });
 
-  const createBulkMutation = trpc.lead.createBulk.useMutation();
   const exportMutation = trpc.lead.exportByClient.useMutation();
 
   const handleExport = async () => {
@@ -99,63 +90,6 @@ export default function LeadsPage() {
       alert("Failed to export leads. Please try again.");
     } finally {
       setIsExporting(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedClientId) {
-      alert("Please select a client");
-      return;
-    }
-
-    if (!linkedinUrls.trim()) {
-      alert("Please paste LinkedIn URLs");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Parse CSV/newline-separated URLs
-      const urls = linkedinUrls
-        .split("\n")
-        .map((url) => url.trim())
-        .filter((url) => url.length > 0);
-
-      if (urls.length === 0) {
-        alert("No valid URLs found");
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Validate URLs are LinkedIn URLs
-      const invalidUrls = urls.filter(
-        (url) => !url.includes("linkedin.com/in/")
-      );
-      if (invalidUrls.length > 0) {
-        alert(`Invalid LinkedIn URLs found:\n${invalidUrls.join("\n")}`);
-        setIsSubmitting(false);
-        return;
-      }
-
-      await createBulkMutation.mutateAsync({
-        clientId: selectedClientId,
-        linkedinUrls: urls,
-        generateEmails,
-        generateOnePager,
-      });
-
-      // Clear form and refetch
-      setLinkedinUrls("");
-      refetch();
-      alert(
-        `Successfully queued ${urls.length} lead(s) for enrichment and research!`
-      );
-    } catch (err) {
-      console.error(err);
-      alert("Failed to create leads. Please check the URLs and try again.");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -226,167 +160,18 @@ export default function LeadsPage() {
         <div className="flex items-center gap-2">
           <Image src="/workflow.png" alt="logo" width={100} height={100} />
           <div className="flex flex-col">
-            <Heading size="8" data-testid="clients-page-heading">
-              Workflow
+            <Heading size="8" data-testid="leads-page-heading">
+              Leads
             </Heading>
             <Text size="2" color="gray" className="mt-2">
-              Manage your workflow and leads
+              View and export your leads
             </Text>
           </div>
         </div>
       </Flex>
 
-      {/* Upload Section */}
-      <Card className="mb-6" data-testid="leads-upload-card">
-        <Heading size="5" mb="4">
-          Upload Leads
-        </Heading>
-
-        <div className="space-y-4">
-          <Box>
-            <Text size="2" weight="medium" className="block mb-2">
-              Select Client <Text color="red">*</Text>
-            </Text>
-            <Select.Root
-              value={selectedClientId}
-              onValueChange={setSelectedClientId}
-              size="2"
-            >
-              <Select.Trigger
-                placeholder="Choose a client..."
-                data-testid="client-select"
-                className="w-full"
-              />
-              <Select.Content>
-                {clientsData?.clients.map((client) => (
-                  <Select.Item
-                    key={client.id}
-                    value={client.id}
-                    data-testid={`client-option-${client.id}`}
-                  >
-                    {client.name}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          </Box>
-
-          <Box>
-            <Text size="2" weight="medium" className="block mb-2">
-              LinkedIn URLs <Text color="red">*</Text>
-            </Text>
-            <Text size="1" color="gray" className="block mb-2">
-              Paste one LinkedIn profile URL per line (e.g.,
-              https://linkedin.com/in/john-doe)
-            </Text>
-            <TextArea
-              data-testid="linkedin-urls-textarea"
-              placeholder="https://linkedin.com/in/john-doe&#10;https://linkedin.com/in/jane-smith&#10;https://linkedin.com/in/alex-johnson"
-              value={linkedinUrls}
-              onChange={(e) => setLinkedinUrls(e.target.value)}
-              rows={8}
-              className="font-mono text-sm"
-            />
-          </Box>
-
-          <Box>
-            <Text size="2" weight="medium" className="block mb-3">
-              Assets to Generate
-            </Text>
-            <Flex direction="column" gap="2">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <Checkbox
-                  data-testid="generate-emails-checkbox"
-                  checked={generateEmails}
-                  onCheckedChange={(checked) =>
-                    setGenerateEmails(checked === true)
-                  }
-                />
-                <Text size="2">Generate Emails</Text>
-              </label>
-              <label className="flex items-center gap-2 cursor-pointer">
-                <Checkbox
-                  data-testid="generate-onepager-checkbox"
-                  checked={generateOnePager}
-                  onCheckedChange={(checked) =>
-                    setGenerateOnePager(checked === true)
-                  }
-                />
-                <Text size="2">Generate One Pager</Text>
-              </label>
-            </Flex>
-          </Box>
-
-          <Flex gap="3" justify="end">
-            <Button
-              onClick={handleSubmit}
-              disabled={
-                isSubmitting || !selectedClientId || !linkedinUrls.trim()
-              }
-              data-testid="submit-leads-button"
-              size="3"
-            >
-              {isSubmitting ? "Uploading..." : "Upload & Enrich Leads"}
-            </Button>
-          </Flex>
-        </div>
-      </Card>
-
-      {/* Export Section */}
-      <Card className="mb-6" data-testid="leads-export-card">
-        <Heading size="5" mb="4">
-          Export Leads
-        </Heading>
-
-        <div className="space-y-4">
-          <Box>
-            <Text size="2" weight="medium" className="block mb-2">
-              Select Client <Text color="red">*</Text>
-            </Text>
-            <Select.Root
-              value={exportClientId}
-              onValueChange={setExportClientId}
-              size="2"
-            >
-              <Select.Trigger
-                placeholder="Choose a client to export..."
-                data-testid="export-client-select"
-                className="w-full"
-              />
-              <Select.Content>
-                {clientsData?.clients.map((client) => (
-                  <Select.Item
-                    key={client.id}
-                    value={client.id}
-                    data-testid={`export-client-option-${client.id}`}
-                  >
-                    {client.name}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          </Box>
-
-          <Flex gap="3" justify="end">
-            <Button
-              onClick={handleExport}
-              disabled={isExporting || !exportClientId}
-              data-testid="export-leads-button"
-              size="3"
-              variant="outline"
-            >
-              {isExporting ? "Exporting..." : "Export to CSV"}
-            </Button>
-          </Flex>
-        </div>
-      </Card>
-
       {/* Leads Table */}
       <Card data-testid="leads-table-card">
-        <Heading size="5" mb="4">
-          All Leads
-        </Heading>
-
         {isLoading && (
           <Box className="p-8 text-center" data-testid="leads-loading">
             <Text color="gray">Loading leads...</Text>
