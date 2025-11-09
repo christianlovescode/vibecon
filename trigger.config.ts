@@ -19,4 +19,7 @@ export default defineConfig({
     },
   },
   dirs: ["trigger"],
+  build: {
+    external: ["@browserbasehq/stagehand", "playwright", "playwright-core", "chromium-bidi"],
+  },
 });

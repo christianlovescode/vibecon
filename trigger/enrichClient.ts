@@ -5,7 +5,7 @@ import { generateText, generateObject } from "ai";
 import { z } from "zod";
 import { Resend } from "resend";
 import db from "@/db/client";
-import { chromium } from "playwright";
+import { Stagehand } from "@browserbasehq/stagehand";
 
 import { perplexity } from "@ai-sdk/perplexity";
 
@@ -62,16 +62,30 @@ const MarketingResearchSchema = z.object({
 });
 
 const VisualAnalysisSchema = z.object({
-  primaryColors: z.array(z.string()).describe("Array of primary brand colors in hex format"),
-  secondaryColors: z.array(z.string()).describe("Array of secondary/accent colors in hex format"),
-  designStyle: z.string().describe("Overall design style (e.g., minimal, corporate, playful, modern, traditional)"),
-  layoutType: z.string().describe("Homepage layout structure (e.g., hero-centered, grid-based, single-column)"),
+  primaryColors: z
+    .array(z.string())
+    .describe("Array of primary brand colors in hex format"),
+  secondaryColors: z
+    .array(z.string())
+    .describe("Array of secondary/accent colors in hex format"),
+  designStyle: z
+    .string()
+    .describe(
+      "Overall design style (e.g., minimal, corporate, playful, modern, traditional)"
+    ),
+  layoutType: z
+    .string()
+    .describe(
+      "Homepage layout structure (e.g., hero-centered, grid-based, single-column)"
+    ),
   visualTone: z.string().describe("Overall visual impression and mood"),
 });
 
 const TextAnalysisSchema = z.object({
   toneOfVoice: z.string().describe("Writing style and communication tone"),
-  brandPersonality: z.array(z.string()).describe("Key brand personality traits"),
+  brandPersonality: z
+    .array(z.string())
+    .describe("Key brand personality traits"),
 });
 
 export const enrichClientTask = task({
@@ -171,65 +185,63 @@ Note for Preview Image, you should look at the OG meta content in the webpage an
       // Phase 3.5: Capture website screenshot and analyze brand
       let visualAnalysis = null;
       let textAnalysis = null;
-      
+
       try {
         // Ensure we have a valid URL
-        const websiteUrl = domain.startsWith('http') ? domain : `https://${domain}`;
-        
-        logger.log("Launching browser to capture screenshot", { websiteUrl });
-        
-        const browser = await chromium.launch({
-          headless: true,
+        const websiteUrl = domain.startsWith("http")
+          ? domain
+          : `https://${domain}`;
+
+        logger.log("Launching Stagehand locally", { websiteUrl });
+
+        // Initialize Stagehand in local mode
+        const stagehand = new Stagehand({
+          env: "LOCAL",
+          verbose: 1,
         });
-        
-        const context = await browser.newContext({
-          viewport: { width: 1920, height: 1080 },
-          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+
+        await stagehand.init();
+
+        // Navigate to the page
+        const page = stagehand.context.pages()[0];
+        await page.goto(websiteUrl, {
+          waitUntil: "domcontentloaded",
         });
-        
-        const page = await context.newPage();
-        
-        // Set timeout and navigate
-        await page.goto(websiteUrl, { 
-          waitUntil: 'networkidle',
-          timeout: 30000 
-        });
-        
+
         logger.log("Page loaded, capturing screenshot");
-        
-        // Take screenshot as base64
-        const screenshot = await page.screenshot({ 
-          encoding: 'base64',
+
+        // Take screenshot and convert to base64
+        const screenshotBuffer = await page.screenshot({
           fullPage: false, // Just capture above the fold
-          type: 'jpeg',
-          quality: 80
         });
-        
+
+        const screenshot = screenshotBuffer.toString("base64");
+
         // Get text content from the page
         const textContent = await page.evaluate(() => {
           // Remove script and style elements
           const clone = document.body.cloneNode(true) as HTMLElement;
-          const scripts = clone.querySelectorAll('script, style, noscript');
-          scripts.forEach(el => el.remove());
+          const scripts = clone.querySelectorAll("script, style, noscript");
+          scripts.forEach((el) => el.remove());
           return clone.innerText;
         });
-        
-        await browser.close();
-        
+
+        await stagehand.close();
+
         logger.log("Screenshot captured, analyzing with GPT-4o Vision", {
-          textLength: textContent.length
+          textLength: textContent.length,
         });
-        
+
         // Analyze screenshot with GPT-4o Vision
         visualAnalysis = await generateObject({
-          model: openai('gpt-4o'),
+          model: openai("gpt-4o"),
           schema: VisualAnalysisSchema,
           messages: [
             {
-              role: 'user',
+              role: "user",
               content: [
-                { 
-                  type: 'text', 
+                {
+                  type: "text",
                   text: `Analyze this website screenshot for ${name} and extract:
 1. Primary brand colors (2-3 main colors used, in hex format like #FF5733)
 2. Secondary/accent colors (1-3 supporting colors, in hex format)
@@ -237,27 +249,27 @@ Note for Preview Image, you should look at the OG meta content in the webpage an
 4. Layout type (hero-centered, grid-based, single-column, multi-column, etc.)
 5. Visual tone (professional, friendly, bold, elegant, innovative, etc.)
 
-Be specific and extract actual color values from the design.` 
+Be specific and extract actual color values from the design.`,
                 },
-                { 
-                  type: 'image', 
-                  image: screenshot 
-                }
-              ]
-            }
-          ]
+                {
+                  type: "image",
+                  image: screenshot,
+                },
+              ],
+            },
+          ],
         });
-        
+
         logger.log("Visual analysis complete", {
           primaryColors: visualAnalysis.object.primaryColors.length,
-          secondaryColors: visualAnalysis.object.secondaryColors.length
+          secondaryColors: visualAnalysis.object.secondaryColors.length,
         });
-        
+
         // Analyze text content for tone of voice
         const textSample = textContent.substring(0, 3000); // First 3000 chars
-        
+
         textAnalysis = await generateObject({
-          model: openai('gpt-4o'),
+          model: openai("gpt-4o"),
           schema: TextAnalysisSchema,
           prompt: `Analyze the following website text from ${name}'s homepage and determine:
 1. Tone of voice (e.g., professional and authoritative, casual and friendly, technical and precise, inspirational and motivational, etc.)
@@ -266,13 +278,12 @@ Be specific and extract actual color values from the design.`
 WEBSITE TEXT:
 ${textSample}
 
-Provide a detailed analysis based on the actual language and style used.`
+Provide a detailed analysis based on the actual language and style used.`,
         });
-        
+
         logger.log("Text analysis complete", {
-          personalityTraits: textAnalysis.object.brandPersonality.length
+          personalityTraits: textAnalysis.object.brandPersonality.length,
         });
-        
       } catch (error) {
         logger.error("Website analysis failed", { error, domain });
         // Don't fail the entire enrichment, just log the error
@@ -420,9 +431,16 @@ Provide a detailed analysis based on the actual language and style used.`
             • Features/Services: ${companyData.object.features.length}<br/>
             • Testimonials: ${companyData.object.testimonials.length}<br/>
             • Branding Assets: ${brandingData.object.brandingAssets.length}<br/>
-            • Marketing Materials: ${marketingData.object.marketingMaterials.length}<br/>
-            • Brand Colors: ${(visualAnalysis?.object.primaryColors.length || 0) + (visualAnalysis?.object.secondaryColors.length || 0)}<br/>
-            • Brand Analysis: ${visualAnalysis && textAnalysis ? 'Complete' : 'Incomplete'}
+            • Marketing Materials: ${
+              marketingData.object.marketingMaterials.length
+            }<br/>
+            • Brand Colors: ${
+              (visualAnalysis?.object.primaryColors.length || 0) +
+              (visualAnalysis?.object.secondaryColors.length || 0)
+            }<br/>
+            • Brand Analysis: ${
+              visualAnalysis && textAnalysis ? "Complete" : "Incomplete"
+            }
           </p>
         `,
       });
@@ -437,7 +455,9 @@ Provide a detailed analysis based on the actual language and style used.`
           testimonials: companyData.object.testimonials.length,
           brandingAssets: brandingData.object.brandingAssets.length,
           marketingMaterials: marketingData.object.marketingMaterials.length,
-          brandColors: (visualAnalysis?.object.primaryColors.length || 0) + (visualAnalysis?.object.secondaryColors.length || 0),
+          brandColors:
+            (visualAnalysis?.object.primaryColors.length || 0) +
+            (visualAnalysis?.object.secondaryColors.length || 0),
           brandAnalysisComplete: !!(visualAnalysis && textAnalysis),
         },
       };
