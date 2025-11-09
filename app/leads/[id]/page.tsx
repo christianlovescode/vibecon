@@ -10,8 +10,8 @@ import {
   Loader2,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Shell from "@/components/Shell";
+import ReactMarkdown from "react-markdown";
 
 export default function LeadDetailPage() {
   const params = useParams();
@@ -253,10 +253,10 @@ export default function LeadDetailPage() {
                             {step.status === "completed" &&
                               step.id === "research" &&
                               lead.researchResult && (
-                                <div className="prose prose-sm max-w-none bg-[#f9f9f9]">
-                                  <p className="v2-text-small">
-                                    {lead.researchResult.substring(0, 2000)}...
-                                  </p>
+                                <div className="prose prose-sm max-w-none bg-[#f9f9f9] p-4 rounded">
+                                  <ReactMarkdown>
+                                    {lead.researchResult}
+                                  </ReactMarkdown>
                                 </div>
                               )}
                             {step.status === "completed" &&
