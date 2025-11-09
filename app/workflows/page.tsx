@@ -349,5 +349,6 @@ export default function WorkflowsPage() {
         </Dialog.Content>
       </Dialog.Root>
     </Box>
+    </>
   );
 }
