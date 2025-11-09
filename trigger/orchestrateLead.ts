@@ -98,11 +98,13 @@ export const orchestrateLeadTask = task({
         currentStatus.lastStep === "research_started";
 
       if (needsResearch) {
-        logger.log("Running research task", { leadId });
+        logger.log("Running research task", { leadId, perplexityModel, anthropicModel });
         const { researchLeadTask } = await import("@/trigger/researchLead");
 
         const researchResult = await tasks.triggerAndWait(researchLeadTask.id, {
           leadId,
+          perplexityModel,
+          anthropicModel,
         });
 
         if (!researchResult.ok) {
