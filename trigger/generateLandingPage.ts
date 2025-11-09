@@ -135,25 +135,25 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const updatedChat = customizationResponse as any;
 
-      logger.log("V0 chat created successfully", {
-        chatId: chat.id,
-        url: chat.url,
-        hasVersion: !!chat.version,
-        versionStatus: chat.version?.status,
+      logger.log("V0 chat customized successfully", {
+        chatId: updatedChat.id,
+        url: updatedChat.url,
+        hasVersion: !!updatedChat.version,
+        versionStatus: updatedChat.version?.status,
       });
 
       // Get the preview URL from the version or fallback to chat URL
       const landingPageUrl =
-        chat.version?.previewUrl ||
-        chat.url ||
-        `https://v0.dev/chat/${chat.id}`;
+        updatedChat.version?.previewUrl ||
+        updatedChat.url ||
+        `https://v0.dev/chat/${updatedChat.id}`;
 
-      // publish the landign page
+      // publish the landing page
 
       const result = await v0.deployments.create({
-        projectId: chat.projectId,
-        chatId: chat.id,
-        versionId: chat.version?.id,
+        projectId: updatedChat.projectId,
+        chatId: updatedChat.id,
+        versionId: updatedChat.version?.id,
       });
 
       console.log("DEPLOYMENT RESULT", result);
