@@ -32,6 +32,32 @@ export default function LeadDetailPage() {
     }
   );
 
+  // Push to Instantly mutation
+  const pushToInstantly = trpc.instantly.pushLead.useMutation({
+    onSuccess: (data) => {
+      toast.success("Lead successfully pushed to Instantly!", {
+        description: "The lead and all generated assets have been synced.",
+      });
+      setIsPushing(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to push lead to Instantly", {
+        description: error.message || "An error occurred while pushing the lead.",
+      });
+      setIsPushing(false);
+    },
+  });
+
+  const handlePushToInstantly = () => {
+    if (!leadData?.lead) return;
+    
+    setIsPushing(true);
+    pushToInstantly.mutate({
+      leadId: leadId,
+      listId: selectedListId,
+    });
+  };
+
   // Log run ID for debugging (will be replaced with Trigger.dev realtime subscription)
   useEffect(() => {
     if (leadData?.lead?.triggerRunId) {
