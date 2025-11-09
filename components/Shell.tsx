@@ -38,7 +38,7 @@ const Shell = ({ children }: { children: React.ReactNode }) => {
             <Link href="/workflow">
               <Workflow className="text-white w-6 h-6" />
             </Link>
-            <Link href="/clients">
+            <Link href="/leads">
               <Users className="text-white w-6 h-6" />
             </Link>
           </div>

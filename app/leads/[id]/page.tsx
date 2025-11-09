@@ -187,7 +187,7 @@ export default function LeadDetailPage() {
               <select
                 value={selectedListId}
                 onChange={(e) => setSelectedListId(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className="px-4 py-2 border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                 data-testid="instantly-list-select"
               >
                 <option value="cda07afa-9e2b-4b80-8e66-dcf47d3fdf53">
