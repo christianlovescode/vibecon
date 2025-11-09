@@ -61,11 +61,32 @@ export const generateLandingPageTask = task({
 
       const client = lead.client;
 
+      // Extract Cal.com slug from calendarUrl
+      // Example: "https://cal.com/rick/get-rick-rolled" -> "rick/get-rick-rolled"
+      let calSlug = "";
+      try {
+        const calUrl = new URL(client.calendarUrl);
+        // Remove leading slash and get the path
+        calSlug = calUrl.pathname.replace(/^\//, "");
+        logger.log("Extracted Cal.com slug", { calSlug });
+      } catch (error) {
+        logger.warn("Failed to parse calendar URL", { 
+          calendarUrl: client.calendarUrl,
+          error 
+        });
+        // Fallback: try to extract everything after "cal.com/"
+        const match = client.calendarUrl.match(/cal\.com\/(.+)/);
+        if (match) {
+          calSlug = match[1];
+          logger.log("Extracted Cal.com slug (fallback)", { calSlug });
+        }
+      }
+
       // First, generate a contextualized prompt for the landing page
       logger.log("Generating landing page prompt");
       const promptResponse = await generateText({
         model: anthropic("claude-sonnet-4-5"),
-        prompt: `You are creating a V0 prompt to generate a hyper-relevant landing page for a lead.
+        prompt: `You are creating a V0 prompt to customize an existing landing page template for a lead.
 
 RESEARCH REPORT:
 ${lead.researchResult}
@@ -77,6 +98,8 @@ CLIENT INFO:
 - Company Summary: ${client.companySummary || "N/A"}
 - Target Customer: ${client.targetCustomer || "N/A"}
 - Value Proposition: ${client.valueProposition || "N/A"}
+- Calendar Booking Link: ${client.calendarUrl}
+- Cal.com Slug: ${calSlug}
 
 FEATURES/SERVICES:
 ${
@@ -96,23 +119,28 @@ ${
     : "No testimonials available"
 }
 
-Write a detailed V0 prompt to generate a landing page that:
+Write a detailed V0 prompt to CUSTOMIZE the existing template (DO NOT change the structure) that:
+
+CRITICAL: Start your prompt with: "DO NOT change the structure or layout of this template. Only update the content with the information provided below."
+
 1. Speaks directly to the lead's pain points and interests (from the research)
 2. Highlights how ${client.name} solves their specific challenges
 3. Uses the talking points from the research
 4. Features the client's services/features that are most relevant
 5. Includes relevant testimonials if available
-6. Has a clear, simple call to action
+6. Uses the Cal.com embed component with the slug: "${calSlug}"
+   - Include this instruction: "Update the Cal.com embed to use calLink=\"${calSlug}\""
 7. Feels personalized without being creepy
 
-The landing page should be clean, modern, and conversion-focused. Include sections for:
-- Hero section (with personalized headline addressing their specific challenge)
-- Problem/solution fit (why this is relevant to them)
-- Key features/benefits (only the most relevant ones)
-- Social proof (testimonials if available)
-- Clear CTA
+The customization should update:
+- Hero section headline to address the lead's specific challenge
+- Problem/solution messaging to be relevant to them
+- Features/benefits to highlight the most relevant ones
+- Testimonials if available
+- CTA buttons and messaging
+- Cal.com embed with the correct slug
 
-Write a comprehensive V0 prompt that will generate this landing page. Be specific about the messaging and structure.`,
+Write a comprehensive V0 prompt that will customize this landing page with the provided content. Be specific about the messaging but emphasize that the template structure must remain unchanged.`,
       });
 
       const v0Prompt = promptResponse.text;

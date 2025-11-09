@@ -53,6 +53,7 @@ export default function ClientDetailPage() {
     headcount: "",
     linkedinUrl: "",
     twitterUrl: "",
+    calendarUrl: "",
   });
 
   const [marketingMaterialForm, setMarketingMaterialForm] = useState({
@@ -81,6 +82,7 @@ export default function ClientDetailPage() {
       headcount: data.client.headcount?.toString() || "",
       linkedinUrl: data.client.linkedinUrl || "",
       twitterUrl: data.client.twitterUrl || "",
+      calendarUrl: data.client.calendarUrl || "",
     });
   }
 
@@ -101,6 +103,7 @@ export default function ClientDetailPage() {
             : undefined,
           linkedinUrl: formData.linkedinUrl || undefined,
           twitterUrl: formData.twitterUrl || undefined,
+          calendarUrl: formData.calendarUrl || undefined,
         },
       });
       setIsEditing(false);
@@ -124,6 +127,7 @@ export default function ClientDetailPage() {
         headcount: data.client.headcount?.toString() || "",
         linkedinUrl: data.client.linkedinUrl || "",
         twitterUrl: data.client.twitterUrl || "",
+        calendarUrl: data.client.calendarUrl || "",
       });
     }
     setIsEditing(false);
@@ -523,6 +527,20 @@ export default function ClientDetailPage() {
                   value={formData.twitterUrl}
                   onChange={(e) =>
                     setFormData({ ...formData, twitterUrl: e.target.value })
+                  }
+                  disabled={!isEditing}
+                />
+              </Box>
+              <Box className="sm:col-span-2">
+                <Text size="2" weight="medium" className="block mb-2">
+                  Calendar URL
+                </Text>
+                <TextField.Root
+                  data-testid="field-calendar"
+                  placeholder="https://cal.com/your-username/meeting-slug"
+                  value={formData.calendarUrl}
+                  onChange={(e) =>
+                    setFormData({ ...formData, calendarUrl: e.target.value })
                   }
                   disabled={!isEditing}
                 />

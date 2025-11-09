@@ -57,6 +57,7 @@ export default function ClientsPage() {
     headcount: "",
     linkedinUrl: "",
     twitterUrl: "",
+    calendarUrl: "",
   });
 
   const resetForm = () => {
@@ -71,6 +72,7 @@ export default function ClientsPage() {
       headcount: "",
       linkedinUrl: "",
       twitterUrl: "",
+      calendarUrl: "",
     });
   };
 
@@ -96,6 +98,7 @@ export default function ClientsPage() {
           : undefined,
         linkedinUrl: formData.linkedinUrl || undefined,
         twitterUrl: formData.twitterUrl || undefined,
+        calendarUrl: formData.calendarUrl,
       });
 
       setIsCreateDialogOpen(false);
@@ -452,6 +455,20 @@ export default function ClientsPage() {
                     />
                   </Box>
                 </div>
+
+                <Box>
+                  <Text size="2" weight="medium" className="block mb-2">
+                    Calendar URL <Text color="red">*</Text>
+                  </Text>
+                  <TextField.Root
+                    data-testid="create-field-calendar"
+                    placeholder="https://cal.com/your-username/meeting-slug"
+                    value={formData.calendarUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, calendarUrl: e.target.value })
+                    }
+                  />
+                </Box>
               </div>
 
               <Flex gap="3" mt="4" justify="end">
@@ -466,7 +483,7 @@ export default function ClientsPage() {
                 </Dialog.Close>
                 <Button
                   onClick={handleCreate}
-                  disabled={!formData.name || createMutation.isPending}
+                  disabled={!formData.name || !formData.calendarUrl || createMutation.isPending}
                   data-testid="create-submit-button"
                 >
                   {createMutation.isPending ? "Creating..." : "Create Client"}

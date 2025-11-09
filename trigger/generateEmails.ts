@@ -65,17 +65,19 @@ CLIENT INFO:
 - Name: ${client.name}
 - Value Proposition: ${client.valueProposition || "N/A"}
 - What they do: ${client.companySummary || "N/A"}
+- Calendar Booking Link: ${client.calendarUrl}
 
 Write an email body that:
 - Is exactly 2-3 sentences
 - References a specific talking point or insight from the research
 - Explains how ${client.name} can help with a relevant pain point
-- Ends with a simple, low-pressure call to action (e.g., "Worth a quick chat?" or "Open to exploring this?")
+- Ends with a call to action encouraging them to book time on the calendar at ${client.calendarUrl}
+- The calendar CTA should be natural and conversational (e.g., "Book some time here: [link]" or "Grab a slot on my calendar: [link]")
 - Sounds conversational and direct
 - AVOIDS phrases like "Hope this finds you well", "I hope this email finds you", "Reaching out to", "I wanted to touch base"
 - AVOIDS overly formal or sales-y language
 
-Return ONLY the email body (2-3 sentences), nothing else.`,
+Return ONLY the email body (2-3 sentences with the calendar link at the end), nothing else.`,
       });
 
       const initialBody = initialBodyResponse.text.trim();
@@ -119,17 +121,19 @@ INITIAL EMAIL BODY: ${initialBody}
 CLIENT INFO:
 - Name: ${client.name}
 - Value Proposition: ${client.valueProposition || "N/A"}
+- Calendar Booking Link: ${client.calendarUrl}
 
 Write a followup email body that:
 - Is exactly 2-3 sentences
 - Takes a different angle or adds new information
 - References a different talking point from the research
 - Acknowledges they're busy without being apologetic
-- Ends with a simple question or call to action
+- Ends with a call to action encouraging them to book time on the calendar at ${client.calendarUrl}
+- The calendar CTA should be natural and conversational (e.g., "Here's my calendar if you want to chat: [link]" or "Book a time here: [link]")
 - Sounds conversational and direct
 - AVOIDS phrases like "Just following up", "Bumping this up", "Circling back", "Did you get my last email?"
 
-Return ONLY the email body (2-3 sentences), nothing else.`,
+Return ONLY the email body (2-3 sentences with the calendar link at the end), nothing else.`,
       });
 
       const followupBody = followupBodyResponse.text.trim();
