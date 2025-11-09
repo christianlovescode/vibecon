@@ -28,6 +28,7 @@ import {
   Save,
   Play,
 } from "lucide-react";
+import Navigation from "../components/Navigation";
 
 type WorkflowStep = {
   id: string;
