@@ -2,6 +2,7 @@ import { logger, task } from "@trigger.dev/sdk/v3";
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import db from "@/db/client";
+import { v0 } from "v0-sdk";
 
 export const generateLandingPageTask = task({
   id: "generate-landing-page",
