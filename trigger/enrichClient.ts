@@ -333,6 +333,14 @@ Provide a detailed analysis based on the actual language and style used.`
           headcount: companyData.object.companyInfo.headcount,
           linkedinUrl: companyData.object.companyInfo.linkedinUrl,
           twitterUrl: companyData.object.companyInfo.twitterUrl,
+          // Brand analysis fields (if available)
+          primaryColors: visualAnalysis?.object.primaryColors || [],
+          secondaryColors: visualAnalysis?.object.secondaryColors || [],
+          designStyle: visualAnalysis?.object.designStyle || null,
+          layoutType: visualAnalysis?.object.layoutType || null,
+          visualTone: visualAnalysis?.object.visualTone || null,
+          toneOfVoice: textAnalysis?.object.toneOfVoice || null,
+          brandPersonality: textAnalysis?.object.brandPersonality || [],
           enrichmentStatus: "completed",
         },
       });
