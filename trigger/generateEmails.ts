@@ -37,9 +37,9 @@ export const generateEmailsTask = task({
       const client = lead.client;
 
       // Generate initial outreach subject
-      logger.log("Generating initial outreach subject");
+      logger.log("Generating initial outreach subject", { anthropicModel });
       const initialSubjectResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a cold email subject line for ${client.name} to reach out to a lead.
 
 RESEARCH REPORT:
