@@ -148,58 +148,59 @@ export default function LeadDetailPage() {
       </div>
 
       {/* Lead Info Card */}
-      <Card className="mb-6">
-        <Heading size="5" mb="4">
+      <div className="v2-card mb-6" data-testid="lead-info-card">
+        <h2 className="v2-heading-2 mb-4">
           Lead Information
-        </Heading>
-        <Flex direction="column" gap="3">
-          <Flex justify="between" align="center">
-            <Text size="2" weight="medium">
+        </h2>
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="v2-text-body font-medium">
               Client:
-            </Text>
-            <Text size="2">{lead.client.name}</Text>
-          </Flex>
-          <Flex justify="between" align="center">
-            <Text size="2" weight="medium">
+            </span>
+            <span className="v2-text-body">{lead.client.name}</span>
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="v2-text-body font-medium">
               LinkedIn:
-            </Text>
+            </span>
             <a
               href={lead.linkedinSlug}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--accent)] hover:underline"
+              className="v2-text-small text-black hover:underline transition-all"
             >
               {lead.linkedinSlug}
             </a>
-          </Flex>
-          <Flex justify="between" align="center">
-            <Text size="2" weight="medium">
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="v2-text-body font-medium">
               Status:
-            </Text>
-            <Badge
-              color={
+            </span>
+            <span
+              className={`v2-badge ${
                 lead.lastStep?.includes("completed")
-                  ? "green"
+                  ? "v2-badge-success"
                   : lead.lastStep?.includes("failed")
-                  ? "red"
-                  : "blue"
-              }
+                  ? "v2-badge-danger"
+                  : "v2-badge-default"
+              }`}
+              data-testid="lead-status-badge"
             >
               {lead.lastStep || "PENDING"}
-            </Badge>
-          </Flex>
+            </span>
+          </div>
           {lead.triggerRunId && (
-            <Flex justify="between" align="center">
-              <Text size="2" weight="medium">
+            <div className="flex justify-between items-center py-2">
+              <span className="v2-text-body font-medium">
                 Run ID:
-              </Text>
-              <Text size="1" className="font-mono text-gray-500">
+              </span>
+              <span className="v2-text-small font-mono text-gray-500">
                 {lead.triggerRunId}
-              </Text>
-            </Flex>
+              </span>
+            </div>
           )}
-        </Flex>
-      </Card>
+        </div>
+      </div>
 
       {/* Workflow Timeline */}
       <Card>
