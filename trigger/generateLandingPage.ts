@@ -111,12 +111,13 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
 
       logger.log("V0 chat created successfully", {
         chatId: chat.id,
-        hasFiles: !!chat.files,
-        fileCount: chat.files?.length || 0,
+        url: chat.url,
+        hasVersion: !!chat.version,
+        versionStatus: chat.version?.status,
       });
 
-      // Get the demo URL (this is the deployed/preview URL)
-      const landingPageUrl = chat.demo || `https://v0.dev/chat/${chat.id}`;
+      // Get the preview URL from the version or fallback to chat URL
+      const landingPageUrl = chat.version?.previewUrl || chat.url || `https://v0.dev/chat/${chat.id}`;
 
       logger.log("Landing page generated", { landingPageUrl });
 
