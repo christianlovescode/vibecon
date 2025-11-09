@@ -242,24 +242,24 @@ export default function LeadDetailPage() {
                     
                     {/* Expandable details */}
                     {expandedSteps.has(step.id) && (
-                      <Box className="mt-4 p-4 bg-gray-50 dark:bg-gray-50 rounded-md">
-                        <Text size="2" weight="medium" className="mb-2">
+                      <div className="mt-4 p-4 bg-gray-50 border border-gray-200">
+                        <p className="v2-text-body font-medium mb-3">
                           Step Details
-                        </Text>
-                        <div className="space-y-2">
+                        </p>
+                        <div className="space-y-3">
                           {step.status === "in_progress" && (
-                            <Text size="2" color="gray">
+                            <p className="v2-text-small">
                               This step is currently executing...
-                            </Text>
+                            </p>
                           )}
                           {step.status === "completed" && step.id === "enrichment" && lead.enrichmentData && (
-                            <pre className="text-xs overflow-auto max-h-64 bg-black text-white  p-2 rounded">
+                            <pre className="text-xs overflow-auto max-h-64 bg-black text-white p-3 border border-gray-300">
                               {JSON.stringify(lead.enrichmentData, null, 2)}
                             </pre>
                           )}
                           {step.status === "completed" && step.id === "research" && lead.researchResult && (
-                            <div className="prose prose-sm max-w-none dark:prose-invert">
-                              <Text size="2">{lead.researchResult.substring(0, 500)}...</Text>
+                            <div className="prose prose-sm max-w-none">
+                              <p className="v2-text-small">{lead.researchResult.substring(0, 500)}...</p>
                             </div>
                           )}
                           {step.status === "completed" && step.id === "emails" && (
@@ -267,29 +267,29 @@ export default function LeadDetailPage() {
                               {lead.assets
                                 ?.filter((asset) => asset.type === "message")
                                 .map((asset) => (
-                                  <Box
+                                  <div
                                     key={asset.id}
-                                    className="p-4 bg-white dark:bg-gray-950 rounded-md border border-gray-200 dark:border-gray-800"
+                                    className="v2-card bg-white"
                                   >
-                                    <Flex justify="between" align="center" className="mb-2">
-                                      <Text size="2" weight="bold">
+                                    <div className="flex justify-between items-center mb-3">
+                                      <span className="v2-text-body font-bold">
                                         {asset.name}
-                                      </Text>
-                                      <Badge color="blue" size="1">
+                                      </span>
+                                      <span className="v2-badge v2-badge-default">
                                         Email
-                                      </Badge>
-                                    </Flex>
-                                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                                      <pre className="whitespace-pre-wrap text-sm bg-gray-50 dark:bg-gray-900 p-3 rounded">
+                                      </span>
+                                    </div>
+                                    <div className="prose prose-sm max-w-none">
+                                      <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-3 border border-gray-200">
                                         {asset.content}
                                       </pre>
                                     </div>
-                                  </Box>
+                                  </div>
                                 ))}
                               {(!lead.assets || lead.assets.filter((a) => a.type === "message").length === 0) && (
-                                <Text size="2" color="gray">
+                                <p className="v2-text-small">
                                   No emails generated yet
-                                </Text>
+                                </p>
                               )}
                             </div>
                           )}
@@ -298,30 +298,30 @@ export default function LeadDetailPage() {
                               {lead.assets
                                 ?.filter((asset) => asset.type === "landing_page")
                                 .map((asset) => (
-                                  <Box
+                                  <div
                                     key={asset.id}
-                                    className="bg-white dark:bg-gray-950 rounded-md border border-gray-200 dark:border-gray-800"
+                                    className="v2-card bg-white"
                                   >
-                                    <Flex justify="between" align="center" className="p-3 border-b border-gray-200 dark:border-gray-800">
-                                      <Text size="2" weight="bold">
+                                    <div className="flex justify-between items-center p-3 border-b border-gray-200">
+                                      <span className="v2-text-body font-bold">
                                         {asset.name}
-                                      </Text>
-                                      <Flex gap="2" align="center">
-                                        <Badge color="purple" size="1">
+                                      </span>
+                                      <div className="flex gap-3 items-center">
+                                        <span className="v2-badge v2-badge-default">
                                           Landing Page
-                                        </Badge>
+                                        </span>
                                         <a
                                           href={asset.content}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-[var(--accent)] hover:underline text-sm"
+                                          className="v2-text-small text-black hover:underline"
                                         >
                                           Open in new tab ↗
                                         </a>
-                                      </Flex>
-                                    </Flex>
+                                      </div>
+                                    </div>
                                     <div className="p-2">
-                                      <div className="relative w-full rounded overflow-hidden border border-gray-200 dark:border-gray-700">
+                                      <div className="relative w-full overflow-hidden border border-gray-200">
                                         <div className="aspect-[16/10] w-full">
                                           <iframe
                                             src={asset.content}
@@ -332,38 +332,38 @@ export default function LeadDetailPage() {
                                         </div>
                                       </div>
                                     </div>
-                                  </Box>
+                                  </div>
                                 ))}
                               {(!lead.assets || lead.assets.filter((a) => a.type === "landing_page").length === 0) && (
-                                <Text size="2" color="gray">
+                                <p className="v2-text-small">
                                   No landing pages generated yet
-                                </Text>
+                                </p>
                               )}
                             </div>
                           )}
                           {step.status === "failed" && (
-                            <Text size="2" color="red">
+                            <p className="v2-text-small text-red-500">
                               This step failed. Please try again.
-                            </Text>
+                            </p>
                           )}
                           {step.status === "pending" && (
-                            <Text size="2" color="gray">
+                            <p className="v2-text-small">
                               Waiting for previous steps to complete...
-                            </Text>
+                            </p>
                           )}
                         </div>
-                      </Box>
+                      </div>
                     )}
                   </div>
-                </Flex>
+                </div>
               </button>
               {index < workflowSteps.length - 1 && (
-                <div className="ml-7 h-8 w-0.5 bg-gray-200 dark:bg-gray-700" />
+                <div className="ml-7 h-8 w-0.5 bg-gray-200" />
               )}
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Assets */}
       {lead.assets && lead.assets.length > 0 && (
