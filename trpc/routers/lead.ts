@@ -133,7 +133,7 @@ export const leadRouter = router({
   // Export leads by client as CSV
   exportByClient: publicProcedure
     .input(z.object({ clientId: z.string() }))
-    .query(async ({ input }) => {
+    .mutation(async ({ input }) => {
       // Fetch all leads for this client with full relationships
       const leads = await db.lead.findMany({
         where: { clientId: input.clientId },
