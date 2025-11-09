@@ -21,6 +21,8 @@ export default function LeadDetailPage() {
   const leadId = params.id as string;
 
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+  const [selectedListId, setSelectedListId] = useState("cda07afa-9e2b-4b80-8e66-dcf47d3fdf53");
+  const [isPushing, setIsPushing] = useState(false);
 
   // Fetch lead data
   const { data: leadData, isLoading } = trpc.lead.getById.useQuery(
