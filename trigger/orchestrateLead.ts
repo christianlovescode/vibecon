@@ -9,8 +9,17 @@ export const orchestrateLeadTask = task({
     linkedinUrl: string;
     generateEmails?: boolean;
     generateOnePager?: boolean;
+    perplexityModel?: string;
+    anthropicModel?: string;
   }) => {
-    const { leadId, linkedinUrl, generateEmails = true, generateOnePager = true } = payload;
+    const { 
+      leadId, 
+      linkedinUrl, 
+      generateEmails = true, 
+      generateOnePager = true,
+      perplexityModel = 'sonar-pro',
+      anthropicModel = 'claude-sonnet-4-5'
+    } = payload;
 
     try {
       logger.log("Starting lead orchestration", { leadId, linkedinUrl });
@@ -89,11 +98,13 @@ export const orchestrateLeadTask = task({
         currentStatus.lastStep === "research_started";
 
       if (needsResearch) {
-        logger.log("Running research task", { leadId });
+        logger.log("Running research task", { leadId, perplexityModel, anthropicModel });
         const { researchLeadTask } = await import("@/trigger/researchLead");
 
         const researchResult = await tasks.triggerAndWait(researchLeadTask.id, {
           leadId,
+          perplexityModel,
+          anthropicModel,
         });
 
         if (!researchResult.ok) {
@@ -136,7 +147,7 @@ export const orchestrateLeadTask = task({
           });
 
           if (existingEmailAssets === 0) {
-            logger.log("Running email generation task", { leadId });
+            logger.log("Running email generation task", { leadId, anthropicModel });
             
             // Update status to emails_started
             await db.lead.update({
@@ -148,6 +159,7 @@ export const orchestrateLeadTask = task({
 
             const emailResult = await tasks.triggerAndWait(generateEmailsTask.id, {
               leadId,
+              anthropicModel,
             });
 
             if (!emailResult.ok) {

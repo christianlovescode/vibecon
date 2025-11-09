@@ -85,10 +85,11 @@ export const leadRouter = router({
         linkedinUrls: z.array(z.string().url('Must be valid URLs')).min(1, 'At least one LinkedIn URL is required'),
         generateEmails: z.boolean().optional().default(true),
         generateOnePager: z.boolean().optional().default(true),
+        modelTier: z.enum(['production', 'development']).optional().default('production'),
       })
     )
     .mutation(async ({ input }) => {
-      const { clientId, linkedinUrls, generateEmails, generateOnePager } = input;
+      const { clientId, linkedinUrls, generateEmails, generateOnePager, modelTier } = input;
 
       // Verify client exists
       const client = await db.client.findUnique({
@@ -114,6 +115,17 @@ export const leadRouter = router({
         })
       );
 
+      // Determine models based on tier
+      const models = modelTier === 'production'
+        ? {
+            perplexityModel: 'sonar-pro',
+            anthropicModel: 'claude-sonnet-4-5',
+          }
+        : {
+            perplexityModel: 'sonar',
+            anthropicModel: 'claude-haiku-4-5',
+          };
+
       // Trigger orchestrator tasks for each lead and store run IDs
       const { orchestrateLeadTask } = await import("@/trigger/orchestrateLead");
       
@@ -124,6 +136,8 @@ export const leadRouter = router({
             linkedinUrl: lead.linkedinSlug,
             generateEmails,
             generateOnePager,
+            perplexityModel: models.perplexityModel,
+            anthropicModel: models.anthropicModel,
           });
           
           // Store the run ID in the lead for real-time tracking

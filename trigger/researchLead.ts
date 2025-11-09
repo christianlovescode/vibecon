@@ -22,8 +22,16 @@ const LeadStructuredDataSchema = z.object({
 export const researchLeadTask = task({
   id: "research-lead",
   maxDuration: 600, // 10 minutes for comprehensive research
-  run: async (payload: { leadId: string }) => {
-    const { leadId } = payload;
+  run: async (payload: { 
+    leadId: string;
+    perplexityModel?: string;
+    anthropicModel?: string;
+  }) => {
+    const { 
+      leadId,
+      perplexityModel = 'sonar-pro',
+      anthropicModel = 'claude-sonnet-4-5'
+    } = payload;
 
     try {
       logger.log("Starting lead research", { leadId });
@@ -56,11 +64,11 @@ export const researchLeadTask = task({
         throw new Error(`Lead has no enrichment data: ${leadId}`);
       }
 
-      logger.log("Phase 1: Extracting structured data from enrichment");
+      logger.log("Phase 1: Extracting structured data from enrichment", { anthropicModel });
 
       // Step 1: Extract structured data from unstructured enrichmentData
       const structuredData = await generateObject({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         schema: LeadStructuredDataSchema,
         prompt: `You are analyzing enriched LinkedIn profile data. Extract the following information in a structured format:
 
@@ -115,7 +123,7 @@ Each one of these should be a separate section in your response.
 `;
 
         const companyResponse = await generateText({
-          model: perplexity("sonar-pro"),
+          model: perplexity(perplexityModel),
           prompt: companyPrompt,
         });
 
@@ -220,7 +228,7 @@ Based on this information, generate a comprehensive research report in the follo
 Generate a thorough, insightful report that would help a salesperson have a highly relevant conversation with this lead.`;
 
       const reportResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: analysisPrompt,
       });
 

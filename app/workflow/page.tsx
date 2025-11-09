@@ -16,9 +16,10 @@ import {
 } from "lucide-react";
 
 const steps = [
-  { id: 1, name: "Client Selection" },
-  { id: 2, name: "Asset Selection" },
-  { id: 3, name: "Prospect URLs" },
+  { id: 1, name: "Client" },
+  { id: 2, name: "Assets" },
+  { id: 3, name: "Prospects" },
+  { id: 4, name: "Model" },
 ];
 
 export default function WorkflowPage() {
@@ -29,6 +30,7 @@ export default function WorkflowPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generateEmails, setGenerateEmails] = useState<boolean>(false);
   const [generateOnePager, setGenerateOnePager] = useState<boolean>(false);
+  const [modelTier, setModelTier] = useState<"production" | "development">("production");
 
   // Fetch clients for dropdown
   const { data: clientsData } = trpc.client.list.useQuery();
@@ -55,6 +57,8 @@ export default function WorkflowPage() {
         return generateEmails || generateOnePager;
       case 2:
         return linkedinUrls.trim() !== "";
+      case 3:
+        return true; // Model tier always has a selection (default: production)
       default:
         return false;
     }
@@ -101,6 +105,7 @@ export default function WorkflowPage() {
         linkedinUrls: urls,
         generateEmails,
         generateOnePager,
+        modelTier,
       });
 
       // Clear form
@@ -366,6 +371,78 @@ export default function WorkflowPage() {
               <div className="text-sm text-gray-500 text-center">
                 <p className="font-medium mb-1">Supported format: CSV</p>
                 <p>Paste one LinkedIn URL per line</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Model Selection */}
+        {currentStep === 3 && (
+          <div className="v2-card">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold mb-2">
+                  Select Models
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Choose which models to use for research and content generation
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center justify-center gap-6">
+                <button
+                  onClick={() => setModelTier("production")}
+                  className="hover:scale-105 transition-all duration-300 w-full"
+                  data-testid="production-model-button"
+                >
+                  <div
+                    className="v2-card p-6 w-full"
+                    style={{
+                      border: modelTier === "production"
+                        ? "2px solid rgb(0, 0, 0)"
+                        : "2px solid #e0e0e0",
+                    }}
+                  >
+                    <div className="text-center space-y-3">
+                      <div className="text-lg font-semibold">Production</div>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p className="font-medium">Models:</p>
+                        <p>• Perplexity: <span className="font-mono text-xs">sonar-pro</span></p>
+                        <p>• Anthropic: <span className="font-mono text-xs">claude-sonnet-4-5</span></p>
+                      </div>
+                      <div className="text-xs text-gray-500 pt-2">
+                        Best quality and performance
+                      </div>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setModelTier("development")}
+                  className="hover:scale-105 transition-all duration-300 w-full"
+                  data-testid="development-model-button"
+                >
+                  <div
+                    className="v2-card p-6 w-full"
+                    style={{
+                      border: modelTier === "development"
+                        ? "2px solid rgb(0, 0, 0)"
+                        : "2px solid #e0e0e0",
+                    }}
+                  >
+                    <div className="text-center space-y-3">
+                      <div className="text-lg font-semibold">Development</div>
+                      <div className="text-sm text-gray-600 space-y-1">
+                        <p className="font-medium">Models:</p>
+                        <p>• Perplexity: <span className="font-mono text-xs">sonar</span></p>
+                        <p>• Anthropic: <span className="font-mono text-xs">claude-haiku-4-5</span></p>
+                      </div>
+                      <div className="text-xs text-gray-500 pt-2">
+                        Faster and more cost-effective
+                      </div>
+                    </div>
+                  </div>
+                </button>
               </div>
             </div>
           </div>

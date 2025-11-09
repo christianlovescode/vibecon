@@ -6,8 +6,14 @@ import db from "@/db/client";
 export const generateEmailsTask = task({
   id: "generate-emails",
   maxDuration: 300, // 5 minutes
-  run: async (payload: { leadId: string }) => {
-    const { leadId } = payload;
+  run: async (payload: { 
+    leadId: string;
+    anthropicModel?: string;
+  }) => {
+    const { 
+      leadId,
+      anthropicModel = 'claude-sonnet-4-5'
+    } = payload;
 
     try {
       logger.log("Starting email generation", { leadId });
@@ -31,9 +37,9 @@ export const generateEmailsTask = task({
       const client = lead.client;
 
       // Generate initial outreach subject
-      logger.log("Generating initial outreach subject");
+      logger.log("Generating initial outreach subject", { anthropicModel });
       const initialSubjectResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a cold email subject line for ${client.name} to reach out to a lead.
 
 RESEARCH REPORT:
@@ -55,7 +61,7 @@ Return ONLY the subject line, nothing else.`,
       // Generate initial outreach body
       logger.log("Generating initial outreach body");
       const initialBodyResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a cold email body for ${client.name} to reach out to a lead.
 
 RESEARCH REPORT:
@@ -86,7 +92,7 @@ Return ONLY the email body (2-3 sentences with the calendar link at the end), no
       // Generate followup outreach subject
       logger.log("Generating followup outreach subject");
       const followupSubjectResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a followup email subject line for ${client.name}. The lead didn't respond to the initial email.
 
 RESEARCH REPORT:
@@ -110,7 +116,7 @@ Return ONLY the subject line, nothing else.`,
       // Generate followup outreach body
       logger.log("Generating followup outreach body");
       const followupBodyResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a followup email body for ${client.name}. The lead didn't respond to the initial email.
 
 RESEARCH REPORT:
