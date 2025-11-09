@@ -878,5 +878,6 @@ export default function ClientDetailPage() {
         </Box>
       </Grid>
     </Box>
+    </>
   );
 }
