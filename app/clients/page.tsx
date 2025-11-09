@@ -72,6 +72,7 @@ export default function ClientsPage() {
       headcount: "",
       linkedinUrl: "",
       twitterUrl: "",
+      calendarUrl: "",
     });
   };
 
