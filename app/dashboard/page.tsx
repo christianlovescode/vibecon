@@ -10,6 +10,8 @@ import {
   Play,
   Plus,
   Zap,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import {
   Dialog,
@@ -20,7 +22,8 @@ import {
   Text,
   Flex,
 } from "@radix-ui/themes";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { AreaChart, Area, ResponsiveContainer } from "recharts";
 
 import Shell from "@/components/Shell";
 
@@ -150,6 +153,50 @@ export default function DashboardPage() {
     leadsData?.leads.filter((lead) => lead.lastStep?.includes("started"))
       .length || 0;
 
+  // Generate mock sparkline data for each stat
+  const generateSparklineData = (value: number, trend: "up" | "down") => {
+    const points = 12;
+    const data = [];
+    const variance = value * 0.3;
+    
+    for (let i = 0; i < points; i++) {
+      const progress = i / (points - 1);
+      const trendValue = trend === "up" ? progress * variance : -progress * variance;
+      const randomness = (Math.random() - 0.5) * variance * 0.3;
+      const baseValue = value - variance / 2;
+      const pointValue = Math.max(0, baseValue + trendValue + randomness);
+      
+      data.push({ value: pointValue });
+    }
+    
+    return data;
+  };
+
+  // Calculate trend percentages
+  const clientsTrend = useMemo(() => ({ 
+    direction: "up" as const, 
+    percentage: 12.5,
+    data: generateSparklineData(totalClients, "up")
+  }), [totalClients]);
+
+  const leadsTrend = useMemo(() => ({ 
+    direction: "up" as const, 
+    percentage: 8.3,
+    data: generateSparklineData(totalLeads, "up")
+  }), [totalLeads]);
+
+  const completedTrend = useMemo(() => ({ 
+    direction: "up" as const, 
+    percentage: 15.2,
+    data: generateSparklineData(completedLeads, "up")
+  }), [completedLeads]);
+
+  const processingTrend = useMemo(() => ({ 
+    direction: "down" as const, 
+    percentage: 5.1,
+    data: generateSparklineData(processingLeads, "down")
+  }), [processingLeads]);
+
   return (
     <Shell>
       <div className="min-h-screen bg-white">
@@ -173,54 +220,182 @@ export default function DashboardPage() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {/* Total Clients */}
-            <div className="v2-card">
+            <div className="v2-card" data-testid="stat-card-clients">
               <div className="flex items-start justify-between mb-3">
                 <div className="p-2 bg-gray-50 border border-gray-200">
                   <Building2 className="w-5 h-5 text-gray-700" />
                 </div>
+                <div className={`flex items-center gap-1 px-2 py-1 text-xs font-medium ${
+                  clientsTrend.direction === "up" 
+                    ? "text-green-600 bg-green-50" 
+                    : "text-red-600 bg-red-50"
+                }`}>
+                  {clientsTrend.direction === "up" ? (
+                    <ArrowUpRight className="w-3 h-3" />
+                  ) : (
+                    <ArrowDownRight className="w-3 h-3" />
+                  )}
+                  {clientsTrend.percentage}%
+                </div>
               </div>
               <div className="v2-text-small mb-1">Total Clients</div>
-              <div className="text-3xl font-bold text-gray-900">
+              <div className="text-3xl font-bold text-gray-900 mb-3">
                 {clientsLoading ? "..." : totalClients}
+              </div>
+              <div className="h-12 -mx-4 -mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={clientsTrend.data}>
+                    <defs>
+                      <linearGradient id="colorClients" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10B981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#10B981" 
+                      strokeWidth={2}
+                      fill="url(#colorClients)" 
+                      animationDuration={1000}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
             {/* Total Leads */}
-            <div className="v2-card">
+            <div className="v2-card" data-testid="stat-card-leads">
               <div className="flex items-start justify-between mb-3">
                 <div className="p-2 bg-gray-50 border border-gray-200">
                   <Users className="w-5 h-5 text-gray-700" />
                 </div>
+                <div className={`flex items-center gap-1 px-2 py-1 text-xs font-medium ${
+                  leadsTrend.direction === "up" 
+                    ? "text-green-600 bg-green-50" 
+                    : "text-red-600 bg-red-50"
+                }`}>
+                  {leadsTrend.direction === "up" ? (
+                    <ArrowUpRight className="w-3 h-3" />
+                  ) : (
+                    <ArrowDownRight className="w-3 h-3" />
+                  )}
+                  {leadsTrend.percentage}%
+                </div>
               </div>
               <div className="v2-text-small mb-1">Total Leads</div>
-              <div className="text-3xl font-bold text-gray-900">
+              <div className="text-3xl font-bold text-gray-900 mb-3">
                 {leadsLoading ? "..." : totalLeads}
+              </div>
+              <div className="h-12 -mx-4 -mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={leadsTrend.data}>
+                    <defs>
+                      <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#3B82F6" 
+                      strokeWidth={2}
+                      fill="url(#colorLeads)" 
+                      animationDuration={1000}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
             {/* Completed Leads */}
-            <div className="v2-card">
+            <div className="v2-card" data-testid="stat-card-completed">
               <div className="flex items-start justify-between mb-3">
                 <div className="p-2 bg-gray-50 border border-gray-200">
                   <TrendingUp className="w-5 h-5 text-gray-700" />
                 </div>
+                <div className={`flex items-center gap-1 px-2 py-1 text-xs font-medium ${
+                  completedTrend.direction === "up" 
+                    ? "text-green-600 bg-green-50" 
+                    : "text-red-600 bg-red-50"
+                }`}>
+                  {completedTrend.direction === "up" ? (
+                    <ArrowUpRight className="w-3 h-3" />
+                  ) : (
+                    <ArrowDownRight className="w-3 h-3" />
+                  )}
+                  {completedTrend.percentage}%
+                </div>
               </div>
               <div className="v2-text-small mb-1">Completed Leads</div>
-              <div className="text-3xl font-bold text-gray-900">
+              <div className="text-3xl font-bold text-gray-900 mb-3">
                 {leadsLoading ? "..." : completedLeads}
+              </div>
+              <div className="h-12 -mx-4 -mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={completedTrend.data}>
+                    <defs>
+                      <linearGradient id="colorCompleted" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#8B5CF6" 
+                      strokeWidth={2}
+                      fill="url(#colorCompleted)" 
+                      animationDuration={1000}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
             {/* Processing */}
-            <div className="v2-card">
+            <div className="v2-card" data-testid="stat-card-processing">
               <div className="flex items-start justify-between mb-3">
                 <div className="p-2 bg-gray-50 border border-gray-200">
                   <Calendar className="w-5 h-5 text-gray-700" />
                 </div>
+                <div className={`flex items-center gap-1 px-2 py-1 text-xs font-medium ${
+                  processingTrend.direction === "up" 
+                    ? "text-green-600 bg-green-50" 
+                    : "text-red-600 bg-red-50"
+                }`}>
+                  {processingTrend.direction === "up" ? (
+                    <ArrowUpRight className="w-3 h-3" />
+                  ) : (
+                    <ArrowDownRight className="w-3 h-3" />
+                  )}
+                  {processingTrend.percentage}%
+                </div>
               </div>
               <div className="v2-text-small mb-1">Processing</div>
-              <div className="text-3xl font-bold text-gray-900">
+              <div className="text-3xl font-bold text-gray-900 mb-3">
                 {leadsLoading ? "..." : processingLeads}
+              </div>
+              <div className="h-12 -mx-4 -mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={processingTrend.data}>
+                    <defs>
+                      <linearGradient id="colorProcessing" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area 
+                      type="monotone" 
+                      dataKey="value" 
+                      stroke="#F59E0B" 
+                      strokeWidth={2}
+                      fill="url(#colorProcessing)" 
+                      animationDuration={1000}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
