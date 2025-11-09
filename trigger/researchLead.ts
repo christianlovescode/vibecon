@@ -22,8 +22,16 @@ const LeadStructuredDataSchema = z.object({
 export const researchLeadTask = task({
   id: "research-lead",
   maxDuration: 600, // 10 minutes for comprehensive research
-  run: async (payload: { leadId: string }) => {
-    const { leadId } = payload;
+  run: async (payload: { 
+    leadId: string;
+    perplexityModel?: string;
+    anthropicModel?: string;
+  }) => {
+    const { 
+      leadId,
+      perplexityModel = 'sonar-pro',
+      anthropicModel = 'claude-sonnet-4-5'
+    } = payload;
 
     try {
       logger.log("Starting lead research", { leadId });
