@@ -437,6 +437,8 @@ Provide a detailed analysis based on the actual language and style used.`
           testimonials: companyData.object.testimonials.length,
           brandingAssets: brandingData.object.brandingAssets.length,
           marketingMaterials: marketingData.object.marketingMaterials.length,
+          brandColors: (visualAnalysis?.object.primaryColors.length || 0) + (visualAnalysis?.object.secondaryColors.length || 0),
+          brandAnalysisComplete: !!(visualAnalysis && textAnalysis),
         },
       };
     } catch (error) {
