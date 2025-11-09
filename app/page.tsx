@@ -40,20 +40,25 @@ export default function LandingPage() {
         />
 
         {/* Content */}
-        <div className="max-w-4xl mx-auto px-4 md:px-6 text-center relative z-10">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 text-center relative z-10">
           <div
             className="inline-block px-3 py-1 bg-gray-100 border border-gray-900 mb-6"
             style={{ borderRadius: 0 }}
           >
             <span className="text-xs font-medium text-gray-900">
-              AI-POWERED LEAD GENERATION
+              AI-NATIVE LEAD GENERATION
             </span>
           </div>
 
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium text-gray-900 mb-6 leading-tight font-sans">
-            Outreach that feels like you&apos;ve read their mind.
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium text-gray-900 mb-6 leading-tight font-sans">
+            We&apos;re replacing $10k/mo lead gen agencies with AI.
           </h1>
 
+          <p className="text-base md:text-lg text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-sans">
+            Dunbar runs your entire outbound. Warm intros when possible,
+            hyper-relevant cold outreach when needed - all at a fraction of the
+            cost of traditional agency.
+          </p>
           <p className="text-base md:text-lg text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-sans">
             Cold emails shouldn&apos;t feel personalized – they should just feel
             relevant. Show prospects you understand their world without spending

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { LayoutDashboard, Workflow, Users, Zap } from "lucide-react";
 
@@ -28,7 +29,7 @@ const Shell = ({ children }: { children: React.ReactNode }) => {
         />
         <nav className="h-screen fixed bg-[#111] left-0 top-0 w-16  flex flex-col items-center justify-between space-y-4">
           <div className="w-16 h-16 flex items-center justify-center border-b border-white/10">
-            <Zap className="text-white w-6 h-6" />
+            <Image src="/dunbar-icon.svg" alt="logo" width={30} height={30} />
           </div>
 
           <div className="flex flex-col items-center justify-center space-y-4">
