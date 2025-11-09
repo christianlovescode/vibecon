@@ -93,24 +93,32 @@ export default function LeadDetailPage() {
 
   if (isLoading) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Text>Loading lead details...</Text>
-      </Box>
+      <>
+        <Navigation />
+        <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <Text>Loading lead details...</Text>
+        </Box>
+      </>
     );
   }
 
   if (error || !data) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Text color="red">Error loading lead: {error?.message}</Text>
-      </Box>
+      <>
+        <Navigation />
+        <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <Text color="red">Error loading lead: {error?.message}</Text>
+        </Box>
+      </>
     );
   }
 
   const { lead } = data;
 
   return (
-    <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <Navigation />
+      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <Flex align="center" gap="4" className="py-6">
         <Button
