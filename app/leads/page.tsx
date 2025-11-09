@@ -23,7 +23,7 @@ export default function LeadsPage() {
   // Fetch clients for dropdown
   const { data: clientsData } = trpc.client.list.useQuery();
 
-  // Fetch leads with auto-refresh when enriching
+  // Fetch leads with auto-refresh when processing
   const {
     data: leadsData,
     isLoading,
@@ -31,11 +31,14 @@ export default function LeadsPage() {
     refetch,
   } = trpc.lead.list.useQuery(undefined, {
     refetchInterval: (query) => {
-      // Auto-refetch every 5 seconds if any lead is enriching
-      const hasEnriching = query.state.data?.leads.some(
-        (lead) => lead.enrichmentData === null
+      // Auto-refetch every 5 seconds if any lead is still processing
+      const hasProcessing = query.state.data?.leads.some(
+        (lead) =>
+          !lead.lastStep ||
+          lead.lastStep === "enrichment_started" ||
+          lead.lastStep === "research_started"
       );
-      return hasEnriching ? 5000 : false;
+      return hasProcessing ? 5000 : false;
     },
   });
 
