@@ -1,9 +1,11 @@
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { generateText, generateObject } from "ai";
 import { z } from "zod";
 import { Resend } from "resend";
 import db from "@/db/client";
+import { chromium } from "playwright";
 
 import { perplexity } from "@ai-sdk/perplexity";
 
