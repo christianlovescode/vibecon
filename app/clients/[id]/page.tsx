@@ -103,6 +103,7 @@ export default function ClientDetailPage() {
             : undefined,
           linkedinUrl: formData.linkedinUrl || undefined,
           twitterUrl: formData.twitterUrl || undefined,
+          calendarUrl: formData.calendarUrl || undefined,
         },
       });
       setIsEditing(false);
