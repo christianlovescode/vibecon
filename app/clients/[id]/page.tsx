@@ -531,6 +531,20 @@ export default function ClientDetailPage() {
                   disabled={!isEditing}
                 />
               </Box>
+              <Box className="sm:col-span-2">
+                <Text size="2" weight="medium" className="block mb-2">
+                  Calendar URL
+                </Text>
+                <TextField.Root
+                  data-testid="field-calendar"
+                  placeholder="https://cal.com/your-username/meeting-slug"
+                  value={formData.calendarUrl}
+                  onChange={(e) =>
+                    setFormData({ ...formData, calendarUrl: e.target.value })
+                  }
+                  disabled={!isEditing}
+                />
+              </Box>
             </div>
           </Card>
 
