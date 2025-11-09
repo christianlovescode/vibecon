@@ -129,4 +129,112 @@ export const leadRouter = router({
         count: createdLeads.length 
       };
     }),
+
+  // Export leads by client as CSV
+  exportByClient: publicProcedure
+    .input(z.object({ clientId: z.string() }))
+    .query(async ({ input }) => {
+      // Fetch all leads for this client with full relationships
+      const leads = await db.lead.findMany({
+        where: { clientId: input.clientId },
+        include: {
+          client: {
+            select: {
+              id: true,
+              name: true,
+              website: true,
+              industry: true,
+              location: true,
+            },
+          },
+          assets: {
+            select: {
+              name: true,
+              content: true,
+              type: true,
+            },
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+
+      if (leads.length === 0) {
+        return { csv: '', count: 0 };
+      }
+
+      // Collect all unique asset names across all leads
+      const assetNames = new Set<string>();
+      leads.forEach(lead => {
+        lead.assets.forEach(asset => {
+          assetNames.add(asset.name);
+        });
+      });
+
+      const sortedAssetNames = Array.from(assetNames).sort();
+
+      // Build CSV headers
+      const headers = [
+        'id',
+        'client_id',
+        'client_name',
+        'client_website',
+        'client_industry',
+        'client_location',
+        'linkedin_url',
+        'enrichment_status',
+        'last_step',
+        'created_at',
+        'updated_at',
+        ...sortedAssetNames,
+      ];
+
+      // Build CSV rows
+      const rows = leads.map(lead => {
+        // Create asset map: name -> content
+        const assetMap = new Map<string, string>();
+        lead.assets.forEach(asset => {
+          assetMap.set(asset.name, asset.content);
+        });
+
+        // Build row with base fields + asset columns
+        const row = [
+          lead.id,
+          lead.client.id,
+          lead.client.name,
+          lead.client.website || '',
+          lead.client.industry || '',
+          lead.client.location || '',
+          lead.linkedinSlug,
+          lead.enrichmentStatus || '',
+          lead.lastStep || '',
+          lead.createdAt.toISOString(),
+          lead.updatedAt.toISOString(),
+          ...sortedAssetNames.map(assetName => assetMap.get(assetName) || ''),
+        ];
+
+        return row;
+      });
+
+      // Convert to CSV string (proper escaping for fields with commas/quotes)
+      const escapeCsvField = (field: string): string => {
+        if (field.includes(',') || field.includes('"') || field.includes('\n')) {
+          return `"${field.replace(/"/g, '""')}"`;
+        }
+        return field;
+      };
+
+      const csvLines = [
+        headers.map(escapeCsvField).join(','),
+        ...rows.map(row => row.map(field => escapeCsvField(String(field))).join(',')),
+      ];
+
+      const csv = csvLines.join('\n');
+
+      return { csv, count: leads.length };
+    }),
 });
