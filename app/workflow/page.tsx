@@ -228,19 +228,121 @@ export default function WorkflowPage() {
       {/* Header */}
       <div className="relative z-10 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-6">
-          <Flex align="center" gap="3">
-            <Sparkles className="w-8 h-8 text-teal-600" />
-            <div>
-              <Heading size="6" className="text-slate-900">
-                Lead Orchestration Workflow
-              </Heading>
-              <Text size="2" className="text-slate-600">
-                Automated pipeline from LinkedIn profile to personalized outreach
-              </Text>
-            </div>
+          <Flex align="center" justify="between">
+            <Flex align="center" gap="3">
+              <Sparkles className="w-8 h-8 text-teal-600" />
+              <div>
+                <Heading size="6" className="text-slate-900">
+                  Lead Orchestration Workflow
+                </Heading>
+                <Text size="2" className="text-slate-600">
+                  Automated pipeline from LinkedIn profile to personalized outreach
+                </Text>
+              </div>
+            </Flex>
+            <Button 
+              data-testid="run-workflow-button"
+              onClick={() => setIsRunModalOpen(true)}
+              size="3"
+              className="bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"
+            >
+              <Play className="w-4 h-4" />
+              Run once
+            </Button>
           </Flex>
         </div>
       </div>
+
+      {/* Run Workflow Modal */}
+      <Dialog.Root open={isRunModalOpen} onOpenChange={setIsRunModalOpen}>
+        <Dialog.Content style={{ maxWidth: 500 }}>
+          <Dialog.Title>Run Workflow</Dialog.Title>
+          <Dialog.Description size="2" mb="4">
+            Configure and execute the lead orchestration workflow
+          </Dialog.Description>
+
+          <Flex direction="column" gap="4">
+            {/* Client Selection */}
+            <label>
+              <Text as="div" size="2" mb="1" weight="bold">
+                Client
+              </Text>
+              <Select.Root value={selectedClient} onValueChange={setSelectedClient}>
+                <Select.Trigger 
+                  data-testid="client-select"
+                  placeholder="Select a client..."
+                  className="w-full"
+                />
+                <Select.Content>
+                  <Select.Item value="acme-corp">Acme Corp</Select.Item>
+                  <Select.Item value="tech-startup">Tech Startup Inc</Select.Item>
+                  <Select.Item value="consulting-firm">Consulting Firm LLC</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            </label>
+
+            {/* Leads List */}
+            <label>
+              <Text as="div" size="2" mb="1" weight="bold">
+                LinkedIn Lead URLs
+              </Text>
+              <Text as="div" size="1" mb="2" className="text-slate-600">
+                Paste one LinkedIn profile URL per line
+              </Text>
+              <TextArea
+                data-testid="leads-textarea"
+                placeholder="https://www.linkedin.com/in/example1&#10;https://www.linkedin.com/in/example2&#10;https://www.linkedin.com/in/example3"
+                value={leadsList}
+                onChange={(e) => setLeadsList(e.target.value)}
+                rows={6}
+                className="w-full font-mono text-sm"
+              />
+            </label>
+
+            {/* Asset Generation Options */}
+            <Box>
+              <Text as="div" size="2" mb="2" weight="bold">
+                Assets to Generate
+              </Text>
+              <Flex direction="column" gap="2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <Checkbox
+                    data-testid="generate-emails-checkbox"
+                    checked={generateEmails}
+                    onCheckedChange={(checked) => setGenerateEmails(checked as boolean)}
+                  />
+                  <Text size="2">Generate personalized emails</Text>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <Checkbox
+                    data-testid="generate-onepager-checkbox"
+                    checked={generateOnePager}
+                    onCheckedChange={(checked) => setGenerateOnePager(checked as boolean)}
+                  />
+                  <Text size="2">Generate one-pager landing pages</Text>
+                </label>
+              </Flex>
+            </Box>
+          </Flex>
+
+          <Flex gap="3" mt="5" justify="end">
+            <Dialog.Close>
+              <Button variant="soft" color="gray" data-testid="cancel-button">
+                Cancel
+              </Button>
+            </Dialog.Close>
+            <Button 
+              data-testid="execute-workflow-button"
+              onClick={handleRunWorkflow}
+              disabled={!selectedClient || !leadsList.trim()}
+              className="bg-teal-600 text-white hover:bg-teal-700 cursor-pointer"
+            >
+              <Play className="w-4 h-4" />
+              Execute Workflow
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
 
       <div className="relative z-10 flex h-[calc(100vh-120px)]">
         {/* Canvas Area */}
