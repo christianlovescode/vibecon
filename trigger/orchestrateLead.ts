@@ -4,8 +4,13 @@ import db from "@/db/client";
 export const orchestrateLeadTask = task({
   id: "orchestrate-lead",
   maxDuration: 900, // 15 minutes for full pipeline
-  run: async (payload: { leadId: string; linkedinUrl: string }) => {
-    const { leadId, linkedinUrl } = payload;
+  run: async (payload: { 
+    leadId: string; 
+    linkedinUrl: string;
+    generateEmails?: boolean;
+    generateOnePager?: boolean;
+  }) => {
+    const { leadId, linkedinUrl, generateEmails = true, generateOnePager = true } = payload;
 
     try {
       logger.log("Starting lead orchestration", { leadId, linkedinUrl });
