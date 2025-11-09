@@ -8,10 +8,12 @@ import {
   XCircle,
   Circle,
   Loader2,
+  Send,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Shell from "@/components/Shell";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 export default function LeadDetailPage() {
   const params = useParams();
@@ -19,6 +21,8 @@ export default function LeadDetailPage() {
   const leadId = params.id as string;
 
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+  const [selectedListId, setSelectedListId] = useState("cda07afa-9e2b-4b80-8e66-dcf47d3fdf53");
+  const [isPushing, setIsPushing] = useState(false);
 
   // Fetch lead data
   const { data: leadData, isLoading } = trpc.lead.getById.useQuery(
@@ -27,6 +31,32 @@ export default function LeadDetailPage() {
       refetchInterval: 3000, // Poll every 3 seconds for updates
     }
   );
+
+  // Push to Instantly mutation
+  const pushToInstantly = trpc.instantly.pushLead.useMutation({
+    onSuccess: (data) => {
+      toast.success("Lead successfully pushed to Instantly!", {
+        description: "The lead and all generated assets have been synced.",
+      });
+      setIsPushing(false);
+    },
+    onError: (error) => {
+      toast.error("Failed to push lead to Instantly", {
+        description: error.message || "An error occurred while pushing the lead.",
+      });
+      setIsPushing(false);
+    },
+  });
+
+  const handlePushToInstantly = () => {
+    if (!leadData?.lead) return;
+    
+    setIsPushing(true);
+    pushToInstantly.mutate({
+      leadId: leadId,
+      listId: selectedListId,
+    });
+  };
 
   // Log run ID for debugging (will be replaced with Trigger.dev realtime subscription)
   useEffect(() => {
@@ -150,6 +180,40 @@ export default function LeadDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Push to Instantly Button */}
+          {lead.lastStep?.includes("completed") && (
+            <div className="flex items-center gap-3">
+              <select
+                value={selectedListId}
+                onChange={(e) => setSelectedListId(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                data-testid="instantly-list-select"
+              >
+                <option value="cda07afa-9e2b-4b80-8e66-dcf47d3fdf53">
+                  Default List
+                </option>
+              </select>
+              <button
+                onClick={handlePushToInstantly}
+                disabled={isPushing}
+                className="v2-button-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="push-to-instantly-button"
+              >
+                {isPushing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Pushing...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Push to Instantly
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Lead Info Card */}
