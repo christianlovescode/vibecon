@@ -483,7 +483,7 @@ export default function ClientsPage() {
                 </Dialog.Close>
                 <Button
                   onClick={handleCreate}
-                  disabled={!formData.name || createMutation.isPending}
+                  disabled={!formData.name || !formData.calendarUrl || createMutation.isPending}
                   data-testid="create-submit-button"
                 >
                   {createMutation.isPending ? "Creating..." : "Create Client"}
