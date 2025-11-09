@@ -111,6 +111,7 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
       });
 
       // Type assertion since we're using sync mode
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const chat = chatResponse as any;
 
       logger.log("V0 chat created successfully", {
@@ -121,7 +122,20 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
       });
 
       // Get the preview URL from the version or fallback to chat URL
-      const landingPageUrl = chat.version?.previewUrl || chat.url || `https://v0.dev/chat/${chat.id}`;
+      const landingPageUrl =
+        chat.version?.previewUrl ||
+        chat.url ||
+        `https://v0.dev/chat/${chat.id}`;
+
+      // publish the landign page
+
+      const result = await v0.deployments.create({
+        projectId: chat.projectId,
+        chatId: chat.id,
+        versionId: chat.version?.id,
+      });
+
+      console.log("DEPLOYMENT RESULT", result);
 
       logger.log("Landing page generated", { landingPageUrl });
 
@@ -132,7 +146,7 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
         data: {
           leadId,
           type: "landing_page",
-          content: landingPageUrl,
+          content: result.webUrl,
           name: "landing_page_url",
         },
       });
