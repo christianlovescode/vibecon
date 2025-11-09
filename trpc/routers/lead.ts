@@ -22,6 +22,11 @@ export const leadRouter = router({
             name: true,
           },
         },
+        _count: {
+          select: {
+            assets: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
