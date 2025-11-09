@@ -110,6 +110,91 @@ export const orchestrateLeadTask = task({
         });
       }
 
+      // STEP 3: Generate email assets if research is completed
+      currentStatus = await fetchLastStatus();
+      logger.log("Checking asset generation status", {
+        leadId,
+        lastStep: currentStatus.lastStep,
+      });
+
+      if (currentStatus.lastStep === "research_completed") {
+        // Check if emails already generated
+        const existingEmailAssets = await db.leadAsset.count({
+          where: {
+            leadId,
+            type: "message",
+          },
+        });
+
+        if (existingEmailAssets === 0) {
+          logger.log("Running email generation task", { leadId });
+          const { generateEmailsTask } = await import("@/trigger/generateEmails");
+
+          const emailResult = await tasks.triggerAndWait(generateEmailsTask.id, {
+            leadId,
+          });
+
+          if (!emailResult.ok) {
+            logger.error("Email generation task failed", { leadId });
+            throw new Error("Email generation task failed");
+          }
+
+          logger.log("Email generation task completed successfully", {
+            leadId,
+            result: emailResult.output,
+          });
+          emailsGenerated = true;
+        } else {
+          logger.log("Skipping email generation - already generated", {
+            leadId,
+            existingAssets: existingEmailAssets,
+          });
+        }
+
+        // Check if landing page already generated
+        const existingLandingPage = await db.leadAsset.count({
+          where: {
+            leadId,
+            type: "landing_page",
+          },
+        });
+
+        if (existingLandingPage === 0) {
+          logger.log("Running landing page generation task", { leadId });
+          const { generateLandingPageTask } = await import(
+            "@/trigger/generateLandingPage"
+          );
+
+          const landingPageResult = await tasks.triggerAndWait(
+            generateLandingPageTask.id,
+            {
+              leadId,
+            }
+          );
+
+          if (!landingPageResult.ok) {
+            logger.error("Landing page generation task failed", { leadId });
+            throw new Error("Landing page generation task failed");
+          }
+
+          logger.log("Landing page generation task completed successfully", {
+            leadId,
+            result: landingPageResult.output,
+          });
+          landingPageGenerated = true;
+        } else {
+          logger.log("Skipping landing page generation - already generated", {
+            leadId,
+            existingAssets: existingLandingPage,
+          });
+        }
+      } else {
+        logger.log("Skipping asset generation - research not completed", {
+          leadId,
+          lastStep: currentStatus.lastStep,
+        });
+      }
+
       logger.log("Lead orchestration completed successfully", { leadId });
 
       return {
@@ -117,6 +202,8 @@ export const orchestrateLeadTask = task({
         leadId,
         enrichmentRan,
         researchRan,
+        emailsGenerated,
+        landingPageGenerated,
       };
     } catch (error) {
       logger.error("Lead orchestration failed", { error, leadId, linkedinUrl });
