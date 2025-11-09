@@ -64,11 +64,11 @@ export const researchLeadTask = task({
         throw new Error(`Lead has no enrichment data: ${leadId}`);
       }
 
-      logger.log("Phase 1: Extracting structured data from enrichment");
+      logger.log("Phase 1: Extracting structured data from enrichment", { anthropicModel });
 
       // Step 1: Extract structured data from unstructured enrichmentData
       const structuredData = await generateObject({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         schema: LeadStructuredDataSchema,
         prompt: `You are analyzing enriched LinkedIn profile data. Extract the following information in a structured format:
 
