@@ -116,7 +116,7 @@ Return ONLY the subject line, nothing else.`,
       // Generate followup outreach body
       logger.log("Generating followup outreach body");
       const followupBodyResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a followup email body for ${client.name}. The lead didn't respond to the initial email.
 
 RESEARCH REPORT:
