@@ -57,6 +57,8 @@ export default function WorkflowPage() {
         return generateEmails || generateOnePager;
       case 2:
         return linkedinUrls.trim() !== "";
+      case 3:
+        return true; // Model tier always has a selection (default: production)
       default:
         return false;
     }
