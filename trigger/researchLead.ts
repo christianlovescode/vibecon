@@ -123,7 +123,7 @@ Each one of these should be a separate section in your response.
 `;
 
         const companyResponse = await generateText({
-          model: perplexity("sonar-pro"),
+          model: perplexity(perplexityModel),
           prompt: companyPrompt,
         });
 
