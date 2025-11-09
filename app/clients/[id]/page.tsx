@@ -82,6 +82,7 @@ export default function ClientDetailPage() {
       headcount: data.client.headcount?.toString() || "",
       linkedinUrl: data.client.linkedinUrl || "",
       twitterUrl: data.client.twitterUrl || "",
+      calendarUrl: data.client.calendarUrl || "",
     });
   }
 
