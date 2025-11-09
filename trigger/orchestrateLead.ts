@@ -9,8 +9,17 @@ export const orchestrateLeadTask = task({
     linkedinUrl: string;
     generateEmails?: boolean;
     generateOnePager?: boolean;
+    perplexityModel?: string;
+    anthropicModel?: string;
   }) => {
-    const { leadId, linkedinUrl, generateEmails = true, generateOnePager = true } = payload;
+    const { 
+      leadId, 
+      linkedinUrl, 
+      generateEmails = true, 
+      generateOnePager = true,
+      perplexityModel = 'sonar-pro',
+      anthropicModel = 'claude-sonnet-4-5'
+    } = payload;
 
     try {
       logger.log("Starting lead orchestration", { leadId, linkedinUrl });
