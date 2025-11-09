@@ -115,6 +115,17 @@ export const leadRouter = router({
         })
       );
 
+      // Determine models based on tier
+      const models = modelTier === 'production'
+        ? {
+            perplexityModel: 'sonar-pro',
+            anthropicModel: 'claude-sonnet-4-5',
+          }
+        : {
+            perplexityModel: 'sonar',
+            anthropicModel: 'claude-haiku-4-5',
+          };
+
       // Trigger orchestrator tasks for each lead and store run IDs
       const { orchestrateLeadTask } = await import("@/trigger/orchestrateLead");
       
@@ -125,6 +136,8 @@ export const leadRouter = router({
             linkedinUrl: lead.linkedinSlug,
             generateEmails,
             generateOnePager,
+            perplexityModel: models.perplexityModel,
+            anthropicModel: models.anthropicModel,
           });
           
           // Store the run ID in the lead for real-time tracking
