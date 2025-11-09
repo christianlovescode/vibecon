@@ -122,6 +122,8 @@ export const leadRouter = router({
           await tasks.trigger(orchestrateLeadTask.id, {
             leadId: lead.id,
             linkedinUrl: lead.linkedinSlug,
+            generateEmails,
+            generateOnePager,
           });
         })
       );
