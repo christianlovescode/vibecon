@@ -47,6 +47,7 @@ export default function LeadsPage() {
   });
 
   const createBulkMutation = trpc.lead.createBulk.useMutation();
+  const exportMutation = trpc.lead.exportByClient.useMutation();
 
   const handleExport = async () => {
     if (!exportClientId) {
@@ -57,7 +58,7 @@ export default function LeadsPage() {
     setIsExporting(true);
 
     try {
-      const result = await trpc.lead.exportByClient.query({
+      const result = await exportMutation.mutateAsync({
         clientId: exportClientId,
       });
 
