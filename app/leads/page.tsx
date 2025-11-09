@@ -276,6 +276,7 @@ export default function LeadsPage() {
                 <Table.ColumnHeaderCell>Client</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>LinkedIn URL</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Assets</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>Created At</Table.ColumnHeaderCell>
               </Table.Row>
             </Table.Header>
@@ -305,6 +306,11 @@ export default function LeadsPage() {
                     </a>
                   </Table.Cell>
                   <Table.Cell>{getStatusBadge(lead.lastStep)}</Table.Cell>
+                  <Table.Cell>
+                    <Badge color={lead._count.assets > 0 ? "green" : "gray"} size="1">
+                      {lead._count.assets} asset{lead._count.assets !== 1 ? "s" : ""}
+                    </Badge>
+                  </Table.Cell>
                   <Table.Cell>
                     <Text size="2" color="gray">
                       {new Date(lead.createdAt).toLocaleDateString("en-US", {
