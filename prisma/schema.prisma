@@ -27,7 +27,7 @@ model Client {
   headcount        Int?
   linkedinUrl      String?  @map("linkedin_url")
   twitterUrl       String?  @map("twitter_url")
-  calendarUrl      String   @map("calendar_url")
+  calendarUrl      String   @map("calendar_url") @default("https://cal.com")
   enrichmentStatus String?  @default("completed") @map("enrichment_status") // pending, enriching, completed, failed
   enrichmentError  String?  @map("enrichment_error")
   createdAt        DateTime @default(now()) @map("created_at")
