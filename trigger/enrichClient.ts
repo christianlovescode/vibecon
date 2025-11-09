@@ -166,6 +166,121 @@ Note for Preview Image, you should look at the OG meta content in the webpage an
         responseLength: marketingResponse.text.length,
       });
 
+      logger.log("Phase 3.5: Website visual and brand analysis");
+
+      // Phase 3.5: Capture website screenshot and analyze brand
+      let visualAnalysis = null;
+      let textAnalysis = null;
+      
+      try {
+        // Ensure we have a valid URL
+        const websiteUrl = domain.startsWith('http') ? domain : `https://${domain}`;
+        
+        logger.log("Launching browser to capture screenshot", { websiteUrl });
+        
+        const browser = await chromium.launch({
+          headless: true,
+        });
+        
+        const context = await browser.newContext({
+          viewport: { width: 1920, height: 1080 },
+          userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        });
+        
+        const page = await context.newPage();
+        
+        // Set timeout and navigate
+        await page.goto(websiteUrl, { 
+          waitUntil: 'networkidle',
+          timeout: 30000 
+        });
+        
+        logger.log("Page loaded, capturing screenshot");
+        
+        // Take screenshot as base64
+        const screenshot = await page.screenshot({ 
+          encoding: 'base64',
+          fullPage: false, // Just capture above the fold
+          type: 'jpeg',
+          quality: 80
+        });
+        
+        // Get text content from the page
+        const textContent = await page.evaluate(() => {
+          // Remove script and style elements
+          const clone = document.body.cloneNode(true) as HTMLElement;
+          const scripts = clone.querySelectorAll('script, style, noscript');
+          scripts.forEach(el => el.remove());
+          return clone.innerText;
+        });
+        
+        await browser.close();
+        
+        logger.log("Screenshot captured, analyzing with GPT-4o Vision", {
+          textLength: textContent.length
+        });
+        
+        // Analyze screenshot with GPT-4o Vision
+        visualAnalysis = await generateObject({
+          model: openai('gpt-4o'),
+          schema: VisualAnalysisSchema,
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { 
+                  type: 'text', 
+                  text: `Analyze this website screenshot for ${name} and extract:
+1. Primary brand colors (2-3 main colors used, in hex format like #FF5733)
+2. Secondary/accent colors (1-3 supporting colors, in hex format)
+3. Design style (minimal, corporate, playful, modern, traditional, etc.)
+4. Layout type (hero-centered, grid-based, single-column, multi-column, etc.)
+5. Visual tone (professional, friendly, bold, elegant, innovative, etc.)
+
+Be specific and extract actual color values from the design.` 
+                },
+                { 
+                  type: 'image', 
+                  image: screenshot 
+                }
+              ]
+            }
+          ]
+        });
+        
+        logger.log("Visual analysis complete", {
+          primaryColors: visualAnalysis.object.primaryColors.length,
+          secondaryColors: visualAnalysis.object.secondaryColors.length
+        });
+        
+        // Analyze text content for tone of voice
+        const textSample = textContent.substring(0, 3000); // First 3000 chars
+        
+        textAnalysis = await generateObject({
+          model: openai('gpt-4o'),
+          schema: TextAnalysisSchema,
+          prompt: `Analyze the following website text from ${name}'s homepage and determine:
+1. Tone of voice (e.g., professional and authoritative, casual and friendly, technical and precise, inspirational and motivational, etc.)
+2. Brand personality traits (3-5 key traits like: innovative, trustworthy, approachable, bold, sophisticated, etc.)
+
+WEBSITE TEXT:
+${textSample}
+
+Provide a detailed analysis based on the actual language and style used.`
+        });
+        
+        logger.log("Text analysis complete", {
+          personalityTraits: textAnalysis.object.brandPersonality.length
+        });
+        
+      } catch (error) {
+        logger.error("Website analysis failed", { error, domain });
+        // Don't fail the entire enrichment, just log the error
+        // Visual analysis will be null and won't be saved
+      }
+
+      logger.log("Phase 3.5 complete");
+
       logger.log("Phase 4: Extracting structured data with Anthropic");
 
       // Phase 4: Extract structured data using Anthropic
