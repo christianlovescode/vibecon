@@ -228,7 +228,7 @@ Based on this information, generate a comprehensive research report in the follo
 Generate a thorough, insightful report that would help a salesperson have a highly relevant conversation with this lead.`;
 
       const reportResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: analysisPrompt,
       });
 
