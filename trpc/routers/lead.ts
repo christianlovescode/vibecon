@@ -43,6 +43,11 @@ export const leadRouter = router({
               name: true,
             },
           },
+          assets: {
+            orderBy: {
+              createdAt: 'asc',
+            },
+          },
         },
       });
 
@@ -51,6 +56,20 @@ export const leadRouter = router({
       }
 
       return { lead };
+    }),
+
+  // Get assets for a lead
+  getAssets: publicProcedure
+    .input(z.object({ leadId: z.string() }))
+    .query(async ({ input }) => {
+      const assets = await db.leadAsset.findMany({
+        where: { leadId: input.leadId },
+        orderBy: {
+          createdAt: 'asc',
+        },
+      });
+
+      return { assets };
     }),
 
   // Create multiple leads from CSV input
