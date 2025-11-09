@@ -1,4 +1,5 @@
 import { defineConfig } from "@trigger.dev/sdk/v3";
+import { prismaExtension } from "@trigger.dev/build/extensions/prisma";
 
 export default defineConfig({
   project: "proj_aldlrvwfedcrzefhmnox",
@@ -22,5 +23,10 @@ export default defineConfig({
   build: {
     external: ["@browserbasehq/stagehand", "playwright", "playwright-core", "chromium-bidi"],
     experimental_autoDetectExternal: false,
+    extensions: [
+      prismaExtension({
+        schema: "prisma/schema.prisma",
+      }),
+    ],
   },
 });
