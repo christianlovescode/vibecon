@@ -164,8 +164,24 @@ const connections = [
 
 export default function WorkflowPage() {
   const [selectedNode, setSelectedNode] = useState<string | null>('start');
+  const [isRunModalOpen, setIsRunModalOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState('');
+  const [leadsList, setLeadsList] = useState('');
+  const [generateEmails, setGenerateEmails] = useState(true);
+  const [generateOnePager, setGenerateOnePager] = useState(true);
 
   const selectedStep = workflowSteps.find(step => step.id === selectedNode);
+
+  const handleRunWorkflow = () => {
+    // TODO: Implement actual workflow execution
+    console.log('Running workflow with:', {
+      client: selectedClient,
+      leads: leadsList.split('\n').filter(l => l.trim()),
+      generateEmails,
+      generateOnePager
+    });
+    setIsRunModalOpen(false);
+  };
 
   const getNodePosition = (index: number) => {
     const rows = [
