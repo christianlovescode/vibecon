@@ -3,8 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Theme } from "@radix-ui/themes";
 import { TRPCProvider } from "@/trpc/Provider";
 
-import { Users, Workflow } from "lucide-react";
-
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
 
@@ -19,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HyperPage",
-  description: "Outreach that feels like you've read their mind",
+  title: "Vibecon",
+  description: "AI-powered warm introductions for founder-led sales",
 };
 
 export default function RootLayout({

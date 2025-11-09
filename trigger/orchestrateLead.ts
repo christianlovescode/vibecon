@@ -137,6 +137,13 @@ export const orchestrateLeadTask = task({
 
           if (existingEmailAssets === 0) {
             logger.log("Running email generation task", { leadId });
+            
+            // Update status to emails_started
+            await db.lead.update({
+              where: { id: leadId },
+              data: { lastStep: "emails_started" },
+            });
+            
             const { generateEmailsTask } = await import("@/trigger/generateEmails");
 
             const emailResult = await tasks.triggerAndWait(generateEmailsTask.id, {
@@ -145,8 +152,19 @@ export const orchestrateLeadTask = task({
 
             if (!emailResult.ok) {
               logger.error("Email generation task failed", { leadId });
+              // Update status to emails_failed
+              await db.lead.update({
+                where: { id: leadId },
+                data: { lastStep: "emails_failed" },
+              });
               throw new Error("Email generation task failed");
             }
+
+            // Update status to emails_completed
+            await db.lead.update({
+              where: { id: leadId },
+              data: { lastStep: "emails_completed" },
+            });
 
             logger.log("Email generation task completed successfully", {
               leadId,
@@ -175,6 +193,13 @@ export const orchestrateLeadTask = task({
 
           if (existingLandingPage === 0) {
             logger.log("Running landing page generation task", { leadId });
+            
+            // Update status to landing_page_started
+            await db.lead.update({
+              where: { id: leadId },
+              data: { lastStep: "landing_page_started" },
+            });
+            
             const { generateLandingPageTask } = await import(
               "@/trigger/generateLandingPage"
             );
@@ -188,8 +213,19 @@ export const orchestrateLeadTask = task({
 
             if (!landingPageResult.ok) {
               logger.error("Landing page generation task failed", { leadId });
+              // Update status to landing_page_failed
+              await db.lead.update({
+                where: { id: leadId },
+                data: { lastStep: "landing_page_failed" },
+              });
               throw new Error("Landing page generation task failed");
             }
+
+            // Update status to landing_page_completed
+            await db.lead.update({
+              where: { id: leadId },
+              data: { lastStep: "landing_page_completed" },
+            });
 
             logger.log("Landing page generation task completed successfully", {
               leadId,

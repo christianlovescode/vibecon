@@ -1,42 +1,64 @@
 "use client";
 
-import {
-  Box,
-  Flex,
-  Heading,
-  Text,
-  Card,
-  TextArea,
-  Select,
-} from "@radix-ui/themes";
+import { Box, TextArea, Select } from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   Play,
-  Workflow,
   MailCheck,
   PanelsTopLeft,
-  Newspaper,
   GalleryHorizontal,
   Video,
   ImagePlay,
   UserPlus,
+  Check,
 } from "lucide-react";
+
+const steps = [
+  { id: 1, name: "Client Selection" },
+  { id: 2, name: "Asset Selection" },
+  { id: 3, name: "Prospect URLs" },
+];
 
 export default function WorkflowPage() {
   const router = useRouter();
+  const [currentStep, setCurrentStep] = useState(0);
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [linkedinUrls, setLinkedinUrls] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [generateEmails, setGenerateEmails] = useState<boolean>(true);
-  const [generateOnePager, setGenerateOnePager] = useState<boolean>(true);
+  const [generateEmails, setGenerateEmails] = useState<boolean>(false);
+  const [generateOnePager, setGenerateOnePager] = useState<boolean>(false);
 
   // Fetch clients for dropdown
   const { data: clientsData } = trpc.client.list.useQuery();
 
   const createBulkMutation = trpc.lead.createBulk.useMutation();
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const canProceed = () => {
+    switch (currentStep) {
+      case 0:
+        return selectedClientId !== "";
+      case 1:
+        return generateEmails || generateOnePager;
+      case 2:
+        return linkedinUrls.trim() !== "";
+      default:
+        return false;
+    }
+  };
 
   const handleSubmit = async () => {
     if (!selectedClientId) {
@@ -104,164 +126,251 @@ export default function WorkflowPage() {
   };
 
   return (
-    <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      <div className="v2-container">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="bg-gray-100 flex items-center justify-center w-12 h-12">
-              <Workflow className="w-5 h-5 text-gray-700" />
-            </div>
-            <div>
-              <h1 className="v2-heading-1">Welcome back, Christian!</h1>
-              <p className="v2-text-small mt-1">CB Workspace / Dashboard</p>
-            </div>
-          </div>
-        </div>
+    <Box className="min-h-screen bg-gray-50">
+      {/* Top Bar */}
+      <div className="bg-white border-b border-gray-200 px-8 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="v2-button-secondary"
+          >
+            Cancel
+          </button>
 
-        <div className="flex items-center gap-2 mb-4">
-          <div className="bg-gray-100 flex items-center justify-center w-8 h-8">
-            1
-          </div>
-          <Text weight={"medium"}>What client is this for?</Text>
-        </div>
-
-        <Select.Root
-          value={selectedClientId}
-          onValueChange={setSelectedClientId}
-          size="3"
-        >
-          <Select.Trigger
-            placeholder="Choose a client..."
-            data-testid="client-select"
-            className="w-full "
-            radius="none"
-          />
-          <Select.Content>
-            {clientsData?.clients.map((client) => (
-              <Select.Item
-                key={client.id}
-                value={client.id}
-                data-testid={`client-option-${client.id}`}
-              >
-                {client.name}
-              </Select.Item>
+          {/* Stepper */}
+          <div className="flex items-center gap-8">
+            {steps.map((step, index) => (
+              <div key={step.id} className="flex items-center gap-2">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    index < currentStep
+                      ? "bg-black text-white"
+                      : index === currentStep
+                      ? "bg-black text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {index < currentStep ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    step.id
+                  )}
+                </div>
+                <span
+                  className={`text-sm ${
+                    index <= currentStep
+                      ? "text-gray-900 font-medium"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {step.name}
+                </span>
+              </div>
             ))}
-          </Select.Content>
-        </Select.Root>
-
-        <div className="flex items-center gap-2 mb-4 mt-8">
-          <div className="bg-gray-100 flex items-center justify-center w-8 h-8">
-            2
           </div>
-          <Text weight={"medium"}>Which assets do you want to generate?</Text>
-        </div>
 
-        <div className="flex items-center space-x-4 mb-8">
-          <button
-            onClick={() => setGenerateEmails(!generateEmails)}
-            className="hover:scale-105 transition-all duration-300"
-          >
+          {/* Navigation Buttons */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleBack}
+              disabled={currentStep === 0}
+              className="v2-button-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Back
+            </button>
+            {currentStep < steps.length - 1 ? (
+              <button
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="v2-button-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting || !canProceed()}
+                className="v2-button-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <Play className="w-4 h-4" />
+                {isSubmitting ? "Starting..." : "Run Workflow"}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="max-w-2xl mx-auto px-8 py-12">
+        {/* Step 0: Client Selection */}
+        {currentStep === 0 && (
+          <div className="v2-card">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold mb-2">
+                  What client is this for?
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Select the client you want to run this workflow for
+                </p>
+              </div>
+
+              <div className="w-full">
+                <Select.Root
+                  value={selectedClientId}
+                  onValueChange={setSelectedClientId}
+                  size="3"
+                >
+                  <Select.Trigger
+                    placeholder="Choose a client..."
+                    data-testid="client-select"
+                    style={{ width: '100%' }}
+                    radius="none"
+                  />
+                  <Select.Content>
+                    {clientsData?.clients.map((client) => (
+                      <Select.Item
+                        key={client.id}
+                        value={client.id}
+                        data-testid={`client-option-${client.id}`}
+                      >
+                        {client.name}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Root>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 1: Asset Selection */}
+        {currentStep === 1 && (
+          <div className="v2-card">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold mb-2">
+                  Which assets do you want to generate?
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Select the assets you want to create for your prospects
+                </p>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+              <button
+                onClick={() => setGenerateEmails(!generateEmails)}
+                className="hover:scale-105 transition-all duration-300"
+              >
+                <div
+                  className="v2-card h-32 w-32 flex items-center justify-center flex-col"
+                  style={{
+                    border: generateEmails
+                      ? "2px solid rgb(0, 0, 0)"
+                      : "2px solid #e0e0e0",
+                  }}
+                >
+                  <MailCheck className="w-6 h-6 text-gray-700 mb-2" />
+                  <div className="text-sm font-medium">Email</div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setGenerateOnePager(!generateOnePager)}
+                className="hover:scale-105 transition-all duration-300"
+              >
+                <div
+                  className="v2-card h-32 w-32 flex items-center justify-center flex-col"
+                  style={{
+                    border: generateOnePager
+                      ? "2px solid rgb(0, 0, 0)"
+                      : "2px solid #e0e0e0",
+                  }}
+                >
+                  <PanelsTopLeft className="w-6 h-6 text-gray-700 mb-2" />
+                  <div className="text-sm font-medium">Landing</div>
+                </div>
+              </button>
+
+              <button className="opacity-50" disabled={true}>
+                <div className="v2-card h-32 w-32 flex items-center justify-center flex-col border-2 border-gray-200">
+                  <UserPlus className="w-6 h-6 text-gray-400 mb-2" />
+                  <div className="text-sm font-medium text-gray-400">
+                    Connection
+                  </div>
+                </div>
+              </button>
+
+              <button className="opacity-50" disabled={true}>
+                <div className="v2-card h-32 w-32 flex items-center justify-center flex-col border-2 border-gray-200">
+                  <GalleryHorizontal className="w-6 h-6 text-gray-400 mb-2" />
+                  <div className="text-sm font-medium text-gray-400">
+                    Slides
+                  </div>
+                </div>
+              </button>
+
+              <button className="opacity-50" disabled={true}>
+                <div className="v2-card h-32 w-32 flex items-center justify-center flex-col border-2 border-gray-200">
+                  <ImagePlay className="w-6 h-6 text-gray-400 mb-2" />
+                  <div className="text-sm font-medium text-gray-400">GIF</div>
+                </div>
+              </button>
+
+              <button className="opacity-50" disabled={true}>
+                <div className="v2-card h-32 w-32 flex items-center justify-center flex-col border-2 border-gray-200">
+                  <Video className="w-6 h-6 text-gray-400 mb-2" />
+                  <div className="text-sm font-medium text-gray-400">
+                    Video
+                  </div>
+                </div>
+              </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Prospect URLs */}
+        {currentStep === 2 && (
+          <div className="v2-card">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-semibold mb-2">
+                  Paste prospect LinkedIn URLs
+                </h2>
+                <p className="text-gray-500 text-sm">
+                  Add LinkedIn profile URLs, one per line
+                </p>
+              </div>
+
             <div
-              className="v2-card h-24 w-24 flex items-center justify-center flex-col"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 bg-white hover:border-gray-400 transition-colors"
               style={{
-                border: generateEmails
-                  ? "1px solid rgb(0, 0, 0)"
-                  : "1px solid #e0e0e0",
+                minHeight: "400px",
               }}
             >
-              <div>
-                <MailCheck className="w-5 h-5 text-gray-700 mb-1" />
-              </div>
-              <div className="v2-text-small">Email</div>
+              <TextArea
+                data-testid="linkedin-urls-textarea"
+                value={linkedinUrls}
+                onChange={(e) => setLinkedinUrls(e.target.value)}
+                placeholder="https://www.linkedin.com/in/example-profile&#10;https://www.linkedin.com/in/another-profile"
+                className="font-mono text-sm border-0 w-full h-full resize-none"
+                radius="none"
+                size="3"
+                style={{
+                  minHeight: "350px",
+                }}
+              />
             </div>
-          </button>
 
-          <button
-            onClick={() => setGenerateOnePager(!generateOnePager)}
-            className="hover:scale-105 transition-all duration-300"
-          >
-            <div
-              className="v2-card h-24 w-24 flex items-center justify-center flex-col"
-              style={{
-                border: generateOnePager
-                  ? "1px solid rgb(0, 0, 0)"
-                  : "1px solid #e0e0e0",
-              }}
-            >
-              <div>
-                <PanelsTopLeft className="w-5 h-5 text-gray-700 mb-1" />
+              <div className="text-sm text-gray-500 text-center">
+                <p className="font-medium mb-1">Supported format: CSV</p>
+                <p>Paste one LinkedIn URL per line</p>
               </div>
-              <div className="v2-text-small">Landing</div>
             </div>
-          </button>
-
-          <button className="opacity-50" disabled={true}>
-            <div className="v2-card h-24 w-24 flex items-center justify-center flex-col">
-              <div>
-                <UserPlus className="w-5 h-5 text-gray-700 mb-1" />
-              </div>
-              <div className="v2-text-small">Connection</div>
-            </div>
-          </button>
-
-          <button className="opacity-50" disabled={true}>
-            <div className="v2-card h-24 w-24 flex items-center justify-center flex-col">
-              <div>
-                <GalleryHorizontal className="w-5 h-5 text-gray-700 mb-1" />
-              </div>
-              <div className="v2-text-small">Slides</div>
-            </div>
-          </button>
-
-          <button className="opacity-50" disabled={true}>
-            <div className="v2-card h-24 w-24 flex items-center justify-center flex-col">
-              <div>
-                <ImagePlay className="w-5 h-5 text-gray-700 mb-1" />
-              </div>
-              <div className="v2-text-small">GIF</div>
-            </div>
-          </button>
-
-          <button className="opacity-50" disabled={true}>
-            <div className="v2-card h-24 w-24 flex items-center justify-center flex-col">
-              <div>
-                <Video className="w-5 h-5 text-gray-700 mb-1" />
-              </div>
-              <div className="v2-text-small">Video</div>
-            </div>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 mb-4 mt-8">
-          <div className="bg-gray-100 flex items-center justify-center w-8 h-8">
-            3
           </div>
-          <Text weight={"medium"}>Paste prospect LinkedIn URLs</Text>
-        </div>
-
-        <TextArea
-          data-testid="linkedin-urls-textarea"
-          value={linkedinUrls}
-          onChange={(e) => setLinkedinUrls(e.target.value)}
-          rows={8}
-          className="font-mono text-sm"
-          radius="none"
-          size="3"
-        />
-
-        <div className="mt-12">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !selectedClientId || !linkedinUrls.trim()}
-            className="v2-button-primary flex items-center gap-2"
-          >
-            <Play className="w-4 h-4" />
-
-            {isSubmitting ? "Starting Workflow..." : "Run Workflow"}
-          </button>
-        </div>
-      </div>{" "}
+        )}
+      </div>
     </Box>
   );
 }

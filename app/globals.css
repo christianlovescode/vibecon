@@ -151,7 +151,7 @@ body {
 
 /* Premium card with purple border and shadow */
 .v2-card {
-  background: var(--v2-surface);
+  background: #fff;
   border: 1px solid var(--v2-border); /* Thin border */
   border-radius: 0; /* Sharp corners */
   padding: var(--v2-space-4);
@@ -337,6 +337,8 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--v2-space-6);
+  position: relative;
+  z-index: 101;
 }
 
 /* Page transitions */
