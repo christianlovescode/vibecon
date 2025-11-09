@@ -98,6 +98,7 @@ export default function ClientsPage() {
           : undefined,
         linkedinUrl: formData.linkedinUrl || undefined,
         twitterUrl: formData.twitterUrl || undefined,
+        calendarUrl: formData.calendarUrl,
       });
 
       setIsCreateDialogOpen(false);
