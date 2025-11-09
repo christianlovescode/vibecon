@@ -1,15 +1,5 @@
 "use client";
 
-import {
-  Box,
-  Flex,
-  Heading,
-  Text,
-  Card,
-  Badge,
-  Button,
-  Spinner,
-} from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, XCircle, Circle, Loader2 } from "lucide-react";
