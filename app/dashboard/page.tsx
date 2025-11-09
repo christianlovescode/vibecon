@@ -153,49 +153,79 @@ export default function DashboardPage() {
     leadsData?.leads.filter((lead) => lead.lastStep?.includes("started"))
       .length || 0;
 
-  // Generate mock sparkline data for each stat
-  const generateSparklineData = (value: number, trend: "up" | "down") => {
+  // Generate stable random offsets once on mount
+  const [randomOffsets] = useState(() => 
+    Array.from({ length: 12 }, () => Math.random() - 0.5)
+  );
+
+  // Calculate trend data with sparklines
+  const clientsTrend = useMemo(() => {
     const points = 12;
     const data = [];
-    const variance = value * 0.3;
+    const variance = totalClients * 0.3;
     
     for (let i = 0; i < points; i++) {
       const progress = i / (points - 1);
-      const trendValue = trend === "up" ? progress * variance : -progress * variance;
-      const randomness = (Math.random() - 0.5) * variance * 0.3;
-      const baseValue = value - variance / 2;
+      const trendValue = progress * variance;
+      const randomness = randomOffsets[i] * variance * 0.3;
+      const baseValue = totalClients - variance / 2;
       const pointValue = Math.max(0, baseValue + trendValue + randomness);
-      
       data.push({ value: pointValue });
     }
     
-    return data;
-  };
+    return { direction: "up" as const, percentage: 12.5, data };
+  }, [totalClients, randomOffsets]);
 
-  // Calculate trend percentages
-  const clientsTrend = useMemo(() => ({ 
-    direction: "up" as const, 
-    percentage: 12.5,
-    data: generateSparklineData(totalClients, "up")
-  }), [totalClients]);
+  const leadsTrend = useMemo(() => {
+    const points = 12;
+    const data = [];
+    const variance = totalLeads * 0.3;
+    
+    for (let i = 0; i < points; i++) {
+      const progress = i / (points - 1);
+      const trendValue = progress * variance;
+      const randomness = randomOffsets[i] * variance * 0.3;
+      const baseValue = totalLeads - variance / 2;
+      const pointValue = Math.max(0, baseValue + trendValue + randomness);
+      data.push({ value: pointValue });
+    }
+    
+    return { direction: "up" as const, percentage: 8.3, data };
+  }, [totalLeads, randomOffsets]);
 
-  const leadsTrend = useMemo(() => ({ 
-    direction: "up" as const, 
-    percentage: 8.3,
-    data: generateSparklineData(totalLeads, "up")
-  }), [totalLeads]);
+  const completedTrend = useMemo(() => {
+    const points = 12;
+    const data = [];
+    const variance = completedLeads * 0.3;
+    
+    for (let i = 0; i < points; i++) {
+      const progress = i / (points - 1);
+      const trendValue = progress * variance;
+      const randomness = randomOffsets[i] * variance * 0.3;
+      const baseValue = completedLeads - variance / 2;
+      const pointValue = Math.max(0, baseValue + trendValue + randomness);
+      data.push({ value: pointValue });
+    }
+    
+    return { direction: "up" as const, percentage: 15.2, data };
+  }, [completedLeads, randomOffsets]);
 
-  const completedTrend = useMemo(() => ({ 
-    direction: "up" as const, 
-    percentage: 15.2,
-    data: generateSparklineData(completedLeads, "up")
-  }), [completedLeads]);
-
-  const processingTrend = useMemo(() => ({ 
-    direction: "down" as const, 
-    percentage: 5.1,
-    data: generateSparklineData(processingLeads, "down")
-  }), [processingLeads]);
+  const processingTrend = useMemo(() => {
+    const points = 12;
+    const data = [];
+    const variance = processingLeads * 0.3;
+    
+    for (let i = 0; i < points; i++) {
+      const progress = i / (points - 1);
+      const trendValue = -progress * variance; // Down trend
+      const randomness = randomOffsets[i] * variance * 0.3;
+      const baseValue = processingLeads - variance / 2;
+      const pointValue = Math.max(0, baseValue + trendValue + randomness);
+      data.push({ value: pointValue });
+    }
+    
+    return { direction: "down" as const, percentage: 5.1, data };
+  }, [processingLeads, randomOffsets]);
 
   return (
     <Shell>
