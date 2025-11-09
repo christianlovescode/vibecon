@@ -62,6 +62,7 @@ export const clientRouter = router({
         headcount: z.number().optional(),
         linkedinUrl: z.string().optional(),
         twitterUrl: z.string().optional(),
+        calendarUrl: z.string().min(1, 'Calendar URL is required'),
       })
     )
     .mutation(async ({ input }) => {
@@ -88,6 +89,7 @@ export const clientRouter = router({
           headcount: z.number().optional(),
           linkedinUrl: z.string().optional(),
           twitterUrl: z.string().optional(),
+          calendarUrl: z.string().optional(),
         }),
       })
     )
@@ -185,6 +187,7 @@ export const clientRouter = router({
           name: input.name,
           website: input.domain,
           enrichmentStatus: "pending",
+          calendarUrl: "", // Will be filled by enrichment
         },
       });
 
