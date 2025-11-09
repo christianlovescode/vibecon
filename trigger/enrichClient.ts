@@ -1,9 +1,11 @@
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { generateText, generateObject } from "ai";
 import { z } from "zod";
 import { Resend } from "resend";
 import db from "@/db/client";
+import { Stagehand } from "@browserbasehq/stagehand";
 
 import { perplexity } from "@ai-sdk/perplexity";
 
@@ -57,6 +59,33 @@ const BrandingResearchSchema = z.object({
 
 const MarketingResearchSchema = z.object({
   marketingMaterials: z.array(MarketingMaterialSchema),
+});
+
+const VisualAnalysisSchema = z.object({
+  primaryColors: z
+    .array(z.string())
+    .describe("Array of primary brand colors in hex format"),
+  secondaryColors: z
+    .array(z.string())
+    .describe("Array of secondary/accent colors in hex format"),
+  designStyle: z
+    .string()
+    .describe(
+      "Overall design style (e.g., minimal, corporate, playful, modern, traditional)"
+    ),
+  layoutType: z
+    .string()
+    .describe(
+      "Homepage layout structure (e.g., hero-centered, grid-based, single-column)"
+    ),
+  visualTone: z.string().describe("Overall visual impression and mood"),
+});
+
+const TextAnalysisSchema = z.object({
+  toneOfVoice: z.string().describe("Writing style and communication tone"),
+  brandPersonality: z
+    .array(z.string())
+    .describe("Key brand personality traits"),
 });
 
 export const enrichClientTask = task({
@@ -151,6 +180,118 @@ Note for Preview Image, you should look at the OG meta content in the webpage an
         responseLength: marketingResponse.text.length,
       });
 
+      logger.log("Phase 3.5: Website visual and brand analysis");
+
+      // Phase 3.5: Capture website screenshot and analyze brand
+      let visualAnalysis = null;
+      let textAnalysis = null;
+
+      try {
+        // Ensure we have a valid URL
+        const websiteUrl = domain.startsWith("http")
+          ? domain
+          : `https://${domain}`;
+
+        logger.log("Launching Stagehand locally", { websiteUrl });
+
+        // Initialize Stagehand in local mode
+        const stagehand = new Stagehand({
+          env: "LOCAL",
+          verbose: 1,
+        });
+
+        await stagehand.init();
+
+        // Navigate to the page
+        const page = stagehand.context.pages()[0];
+        await page.goto(websiteUrl, {
+          waitUntil: "domcontentloaded",
+        });
+
+        logger.log("Page loaded, capturing screenshot");
+
+        // Take screenshot and convert to base64
+        const screenshotBuffer = await page.screenshot({
+          fullPage: false, // Just capture above the fold
+        });
+
+        const screenshot = screenshotBuffer.toString("base64");
+
+        // Get text content from the page
+        const textContent = await page.evaluate(() => {
+          // Remove script and style elements
+          const clone = document.body.cloneNode(true) as HTMLElement;
+          const scripts = clone.querySelectorAll("script, style, noscript");
+          scripts.forEach((el) => el.remove());
+          return clone.innerText;
+        });
+
+        await stagehand.close();
+
+        logger.log("Screenshot captured, analyzing with GPT-4o Vision", {
+          textLength: textContent.length,
+        });
+
+        // Analyze screenshot with GPT-4o Vision
+        visualAnalysis = await generateObject({
+          model: openai("gpt-4o"),
+          schema: VisualAnalysisSchema,
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `Analyze this website screenshot for ${name} and extract:
+1. Primary brand colors (2-3 main colors used, in hex format like #FF5733)
+2. Secondary/accent colors (1-3 supporting colors, in hex format)
+3. Design style (minimal, corporate, playful, modern, traditional, etc.)
+4. Layout type (hero-centered, grid-based, single-column, multi-column, etc.)
+5. Visual tone (professional, friendly, bold, elegant, innovative, etc.)
+
+Be specific and extract actual color values from the design.`,
+                },
+                {
+                  type: "image",
+                  image: screenshot,
+                },
+              ],
+            },
+          ],
+        });
+
+        logger.log("Visual analysis complete", {
+          primaryColors: visualAnalysis.object.primaryColors.length,
+          secondaryColors: visualAnalysis.object.secondaryColors.length,
+        });
+
+        // Analyze text content for tone of voice
+        const textSample = textContent.substring(0, 3000); // First 3000 chars
+
+        textAnalysis = await generateObject({
+          model: openai("gpt-4o"),
+          schema: TextAnalysisSchema,
+          prompt: `Analyze the following website text from ${name}'s homepage and determine:
+1. Tone of voice (e.g., professional and authoritative, casual and friendly, technical and precise, inspirational and motivational, etc.)
+2. Brand personality traits (3-5 key traits like: innovative, trustworthy, approachable, bold, sophisticated, etc.)
+
+WEBSITE TEXT:
+${textSample}
+
+Provide a detailed analysis based on the actual language and style used.`,
+        });
+
+        logger.log("Text analysis complete", {
+          personalityTraits: textAnalysis.object.brandPersonality.length,
+        });
+      } catch (error) {
+        logger.error("Website analysis failed", { error, domain });
+        // Don't fail the entire enrichment, just log the error
+        // Visual analysis will be null and won't be saved
+      }
+
+      logger.log("Phase 3.5 complete");
+
       logger.log("Phase 4: Extracting structured data with Anthropic");
 
       // Phase 4: Extract structured data using Anthropic
@@ -203,6 +344,14 @@ Note for Preview Image, you should look at the OG meta content in the webpage an
           headcount: companyData.object.companyInfo.headcount,
           linkedinUrl: companyData.object.companyInfo.linkedinUrl,
           twitterUrl: companyData.object.companyInfo.twitterUrl,
+          // Brand analysis fields (if available)
+          primaryColors: visualAnalysis?.object.primaryColors || [],
+          secondaryColors: visualAnalysis?.object.secondaryColors || [],
+          designStyle: visualAnalysis?.object.designStyle || null,
+          layoutType: visualAnalysis?.object.layoutType || null,
+          visualTone: visualAnalysis?.object.visualTone || null,
+          toneOfVoice: textAnalysis?.object.toneOfVoice || null,
+          brandPersonality: textAnalysis?.object.brandPersonality || [],
           enrichmentStatus: "completed",
         },
       });
@@ -282,7 +431,16 @@ Note for Preview Image, you should look at the OG meta content in the webpage an
             • Features/Services: ${companyData.object.features.length}<br/>
             • Testimonials: ${companyData.object.testimonials.length}<br/>
             • Branding Assets: ${brandingData.object.brandingAssets.length}<br/>
-            • Marketing Materials: ${marketingData.object.marketingMaterials.length}
+            • Marketing Materials: ${
+              marketingData.object.marketingMaterials.length
+            }<br/>
+            • Brand Colors: ${
+              (visualAnalysis?.object.primaryColors.length || 0) +
+              (visualAnalysis?.object.secondaryColors.length || 0)
+            }<br/>
+            • Brand Analysis: ${
+              visualAnalysis && textAnalysis ? "Complete" : "Incomplete"
+            }
           </p>
         `,
       });
@@ -297,6 +455,10 @@ Note for Preview Image, you should look at the OG meta content in the webpage an
           testimonials: companyData.object.testimonials.length,
           brandingAssets: brandingData.object.brandingAssets.length,
           marketingMaterials: marketingData.object.marketingMaterials.length,
+          brandColors:
+            (visualAnalysis?.object.primaryColors.length || 0) +
+            (visualAnalysis?.object.secondaryColors.length || 0),
+          brandAnalysisComplete: !!(visualAnalysis && textAnalysis),
         },
       };
     } catch (error) {

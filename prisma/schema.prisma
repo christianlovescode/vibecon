@@ -30,6 +30,16 @@ model Client {
   calendarUrl      String   @map("calendar_url") @default("https://cal.com")
   enrichmentStatus String?  @default("completed") @map("enrichment_status") // pending, enriching, completed, failed
   enrichmentError  String?  @map("enrichment_error")
+  
+  // Brand Analysis Fields
+  primaryColors    String[] @default([]) @map("primary_colors")
+  secondaryColors  String[] @default([]) @map("secondary_colors")
+  designStyle      String?  @map("design_style")
+  layoutType       String?  @map("layout_type")
+  visualTone       String?  @map("visual_tone")
+  toneOfVoice      String?  @map("tone_of_voice")
+  brandPersonality String[] @default([]) @map("brand_personality")
+  
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
