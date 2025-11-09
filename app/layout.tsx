@@ -40,6 +40,7 @@ export default function RootLayout({
             scaling="100%"
           >
             {children}
+            <Toaster position="top-right" richColors />
             {/* <div className="bg-[#FAF7F2] min-h-screen">
               <div className="w-full h-full flex">
                 <nav className="h-screen fixed bg-[#111] left-0 top-0 w-24 flex flex-col items-center justify-center">
