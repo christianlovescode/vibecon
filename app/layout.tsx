@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Theme } from "@radix-ui/themes";
 import { TRPCProvider } from "@/trpc/Provider";
+import { Toaster } from "sonner";
 
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
