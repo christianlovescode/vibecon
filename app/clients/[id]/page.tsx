@@ -53,6 +53,7 @@ export default function ClientDetailPage() {
     headcount: "",
     linkedinUrl: "",
     twitterUrl: "",
+    calendarUrl: "",
   });
 
   const [marketingMaterialForm, setMarketingMaterialForm] = useState({
