@@ -6,8 +6,14 @@ import db from "@/db/client";
 export const generateEmailsTask = task({
   id: "generate-emails",
   maxDuration: 300, // 5 minutes
-  run: async (payload: { leadId: string }) => {
-    const { leadId } = payload;
+  run: async (payload: { 
+    leadId: string;
+    anthropicModel?: string;
+  }) => {
+    const { 
+      leadId,
+      anthropicModel = 'claude-sonnet-4-5'
+    } = payload;
 
     try {
       logger.log("Starting email generation", { leadId });
