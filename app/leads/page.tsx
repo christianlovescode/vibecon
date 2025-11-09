@@ -97,34 +97,59 @@ export default function LeadsPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    if (status === "enriching") {
+  const getStatusBadge = (lastStep: string | null) => {
+    if (!lastStep) {
       return (
-        <Badge color="blue" size="1" data-testid="status-enriching">
-          ENRICHING
-        </Badge>
-      );
-    }
-    if (status === "completed") {
-      return (
-        <Badge color="green" size="1" data-testid="status-completed">
-          COMPLETED
-        </Badge>
-      );
-    }
-    if (status === "failed") {
-      return (
-        <Badge color="red" size="1" data-testid="status-failed">
-          FAILED
+        <Badge color="gray" size="1" data-testid="status-pending">
+          PENDING
         </Badge>
       );
     }
 
-    return (
-      <Badge color="green" size="1" data-testid="status-completed">
-        COMPLETED
-      </Badge>
-    );
+    switch (lastStep) {
+      case "enrichment_started":
+        return (
+          <Badge color="blue" size="1" data-testid="status-enriching">
+            ENRICHING
+          </Badge>
+        );
+      case "enrichment_completed":
+        return (
+          <Badge color="cyan" size="1" data-testid="status-enriched">
+            ENRICHED
+          </Badge>
+        );
+      case "enrichment_failed":
+        return (
+          <Badge color="red" size="1" data-testid="status-enrich-failed">
+            ENRICH FAILED
+          </Badge>
+        );
+      case "research_started":
+        return (
+          <Badge color="blue" size="1" data-testid="status-researching">
+            RESEARCHING
+          </Badge>
+        );
+      case "research_completed":
+        return (
+          <Badge color="green" size="1" data-testid="status-completed">
+            COMPLETED
+          </Badge>
+        );
+      case "research_failed":
+        return (
+          <Badge color="red" size="1" data-testid="status-research-failed">
+            RESEARCH FAILED
+          </Badge>
+        );
+      default:
+        return (
+          <Badge color="gray" size="1" data-testid="status-unknown">
+            {lastStep.toUpperCase()}
+          </Badge>
+        );
+    }
   };
 
   return (
