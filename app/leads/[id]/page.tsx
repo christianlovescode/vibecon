@@ -180,6 +180,40 @@ export default function LeadDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Push to Instantly Button */}
+          {lead.lastStep?.includes("completed") && (
+            <div className="flex items-center gap-3">
+              <select
+                value={selectedListId}
+                onChange={(e) => setSelectedListId(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                data-testid="instantly-list-select"
+              >
+                <option value="cda07afa-9e2b-4b80-8e66-dcf47d3fdf53">
+                  Default List
+                </option>
+              </select>
+              <button
+                onClick={handlePushToInstantly}
+                disabled={isPushing}
+                className="v2-button-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="push-to-instantly-button"
+              >
+                {isPushing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Pushing...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Push to Instantly
+                  </>
+                )}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Lead Info Card */}
