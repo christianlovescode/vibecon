@@ -8,10 +8,12 @@ import {
   XCircle,
   Circle,
   Loader2,
+  Send,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Shell from "@/components/Shell";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 export default function LeadDetailPage() {
   const params = useParams();
