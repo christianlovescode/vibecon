@@ -21,6 +21,8 @@ export default function LeadsPage() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [linkedinUrls, setLinkedinUrls] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [exportClientId, setExportClientId] = useState<string>("");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch clients for dropdown
   const { data: clientsData } = trpc.client.list.useQuery();
@@ -45,6 +47,54 @@ export default function LeadsPage() {
   });
 
   const createBulkMutation = trpc.lead.createBulk.useMutation();
+  const exportMutation = trpc.lead.exportByClient.useMutation();
+
+  const handleExport = async () => {
+    if (!exportClientId) {
+      alert("Please select a client to export");
+      return;
+    }
+
+    setIsExporting(true);
+
+    try {
+      const result = await exportMutation.mutateAsync({
+        clientId: exportClientId,
+      });
+
+      if (result.count === 0) {
+        alert("No leads found for this client");
+        setIsExporting(false);
+        return;
+      }
+
+      // Create blob and download
+      const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      
+      // Get client name for filename
+      const selectedClient = clientsData?.clients.find(
+        (c) => c.id === exportClientId
+      );
+      const clientName = selectedClient?.name.replace(/[^a-z0-9]/gi, "_").toLowerCase() || "client";
+      const timestamp = new Date().toISOString().split("T")[0];
+      
+      link.download = `${clientName}_leads_${timestamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      alert(`Successfully exported ${result.count} lead(s)!`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to export leads. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!selectedClientId) {
@@ -238,6 +288,55 @@ export default function LeadsPage() {
               size="3"
             >
               {isSubmitting ? "Uploading..." : "Upload & Enrich Leads"}
+            </Button>
+          </Flex>
+        </div>
+      </Card>
+
+      {/* Export Section */}
+      <Card className="mb-6" data-testid="leads-export-card">
+        <Heading size="5" mb="4">
+          Export Leads
+        </Heading>
+
+        <div className="space-y-4">
+          <Box>
+            <Text size="2" weight="medium" className="block mb-2">
+              Select Client <Text color="red">*</Text>
+            </Text>
+            <Select.Root
+              value={exportClientId}
+              onValueChange={setExportClientId}
+              size="2"
+            >
+              <Select.Trigger
+                placeholder="Choose a client to export..."
+                data-testid="export-client-select"
+                className="w-full"
+              />
+              <Select.Content>
+                {clientsData?.clients.map((client) => (
+                  <Select.Item
+                    key={client.id}
+                    value={client.id}
+                    data-testid={`export-client-option-${client.id}`}
+                  >
+                    {client.name}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </Box>
+
+          <Flex gap="3" justify="end">
+            <Button
+              onClick={handleExport}
+              disabled={isExporting || !exportClientId}
+              data-testid="export-leads-button"
+              size="3"
+              variant="outline"
+            >
+              {isExporting ? "Exporting..." : "Export to CSV"}
             </Button>
           </Flex>
         </div>
