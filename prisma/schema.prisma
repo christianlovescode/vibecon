@@ -107,7 +107,22 @@ model Lead {
   updatedAt        DateTime @updatedAt @map("updated_at")
   enrichmentStatus String?  @default("completed") @map("enrichment_status") // pending, enriching, completed, failed
 
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  assets LeadAsset[]
 
   @@map("leads")
+}
+
+model LeadAsset {
+  id        String   @id @default(uuid())
+  leadId    String   @map("lead_id")
+  type      String   // "message" or "landing_page"
+  content   String   @db.Text // The message content or landing page URL
+  name      String   // Variable name for customer's email tool (e.g., "initial_outreach_subject")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@map("lead_assets")
 }
