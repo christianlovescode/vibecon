@@ -105,10 +105,13 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
       }
 
       // Create a new chat with V0 to generate the landing page
-      const chat = await v0.chats.create({
+      const chatResponse = await v0.chats.create({
         message: v0Prompt,
         responseMode: "sync", // Non-streaming response
       });
+
+      // Type assertion since we're using sync mode
+      const chat = chatResponse as any;
 
       logger.log("V0 chat created successfully", {
         chatId: chat.id,
