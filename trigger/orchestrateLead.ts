@@ -147,7 +147,7 @@ export const orchestrateLeadTask = task({
           });
 
           if (existingEmailAssets === 0) {
-            logger.log("Running email generation task", { leadId });
+            logger.log("Running email generation task", { leadId, anthropicModel });
             
             // Update status to emails_started
             await db.lead.update({
@@ -159,6 +159,7 @@ export const orchestrateLeadTask = task({
 
             const emailResult = await tasks.triggerAndWait(generateEmailsTask.id, {
               leadId,
+              anthropicModel,
             });
 
             if (!emailResult.ok) {
