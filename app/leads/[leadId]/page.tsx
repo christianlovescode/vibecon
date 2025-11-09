@@ -307,5 +307,6 @@ export default function LeadDetailPage() {
         )}
       </Card>
     </Box>
+    </>
   );
 }
