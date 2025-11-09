@@ -14,6 +14,7 @@ import { trpc } from "@/trpc/client";
 import { useRouter, useParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import Navigation from "../../components/Navigation";
 
 export default function LeadDetailPage() {
   const router = useRouter();
