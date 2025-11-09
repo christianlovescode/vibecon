@@ -149,6 +149,11 @@ The customization should update:
 - CTA buttons and messaging
 - Cal.com embed with the correct slug
 
+IMPORTANT: YOU SHOULD MAKE THE CONTENT AND MESSAGING AS PERSONALIZED AND RELEVANT TO THE LEAD AS POSSIBLE.
+- Don't be afraid to mention their company name, title, or location in the messaging multiple times if it's relevant to the section.
+- Try to focus on why you think the lead would like to see
+- The title and subtitle should be specific to the lead and their company.
+
 Write a comprehensive V0 prompt that will customize this landing page with the provided content. Be specific about the messaging but emphasize that the template structure must remain unchanged.`,
       });
 

@@ -308,35 +308,45 @@ export default function LeadDetailPage() {
                                         key={asset.id}
                                         className="v2-card bg-white"
                                       >
-                                        <div className="flex justify-between items-center p-3 border-b border-gray-200">
-                                          <span className="v2-text-body font-bold">
-                                            {asset.name}
-                                          </span>
-                                          <div className="flex gap-3 items-center">
-                                            <span className="v2-badge v2-badge-default">
-                                              Landing Page
-                                            </span>
-                                            <a
-                                              href={asset.content}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="v2-text-small text-black hover:underline"
-                                            >
-                                              Open in new tab ↗
-                                            </a>
-                                          </div>
-                                        </div>
-                                        <div className="p-2">
-                                          <div className="relative w-full overflow-hidden border border-gray-200">
-                                            <div className="aspect-[16/10] w-full">
-                                              <iframe
-                                                src={asset.content}
-                                                className="w-full h-full"
-                                                title={asset.name}
-                                                sandbox="allow-scripts allow-same-origin"
-                                              />
+                                        <div className="p-4">
+                                          <div className="flex items-center justify-between mb-3">
+                                            <div className="flex items-center gap-2">
+                                              <span className="v2-badge v2-badge-default">
+                                                Landing Page
+                                              </span>
+                                              <span className="v2-text-body font-bold">
+                                                {asset.name}
+                                              </span>
                                             </div>
                                           </div>
+                                          
+                                          <a
+                                            href={asset.content}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block w-full"
+                                          >
+                                            <div className="relative w-full overflow-hidden border-2 border-gray-200 hover:border-black transition-all cursor-pointer group">
+                                              <div className="aspect-[16/10] w-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+                                                <div className="text-center">
+                                                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-400 group-hover:text-black transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                  </svg>
+                                                  <p className="v2-text-body font-semibold mb-1">
+                                                    View Generated Landing Page
+                                                  </p>
+                                                  <p className="v2-text-small text-gray-500">
+                                                    Click to open in new tab
+                                                  </p>
+                                                </div>
+                                              </div>
+                                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all p-3">
+                                                <p className="v2-text-small truncate text-gray-600 group-hover:text-black">
+                                                  {asset.content}
+                                                </p>
+                                              </div>
+                                            </div>
+                                          </a>
                                         </div>
                                       </div>
                                     ))}
