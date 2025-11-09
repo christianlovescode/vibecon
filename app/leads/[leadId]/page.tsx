@@ -208,6 +208,70 @@ export default function LeadDetailPage() {
         )}
       </Card>
 
+      {/* Generated Assets */}
+      {lead.assets && lead.assets.length > 0 && (
+        <Card className="mb-6" data-testid="generated-assets-card">
+          <Heading size="5" className="mb-4">
+            Generated Assets
+          </Heading>
+
+          <div className="space-y-4">
+            {/* Email Messages */}
+            {lead.assets
+              .filter((asset) => asset.type === "message")
+              .map((asset) => (
+                <div key={asset.id} className="space-y-2">
+                  <Flex justify="between" align="center">
+                    <Text size="2" weight="bold">
+                      {asset.name
+                        .split("_")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")}
+                    </Text>
+                    <Badge color="blue" size="1">
+                      {asset.type}
+                    </Badge>
+                  </Flex>
+                  <div className="bg-[var(--gray-2)] rounded-lg p-4">
+                    <Text size="2" className="whitespace-pre-wrap">
+                      {asset.content}
+                    </Text>
+                  </div>
+                </div>
+              ))}
+
+            {/* Landing Page */}
+            {lead.assets
+              .filter((asset) => asset.type === "landing_page")
+              .map((asset) => (
+                <div key={asset.id} className="space-y-2">
+                  <Flex justify="between" align="center">
+                    <Text size="2" weight="bold">
+                      Landing Page
+                    </Text>
+                    <Badge color="green" size="1">
+                      {asset.type}
+                    </Badge>
+                  </Flex>
+                  <div className="bg-[var(--gray-2)] rounded-lg p-4">
+                    <a
+                      href={asset.content}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[var(--accent)] hover:underline"
+                    >
+                      {asset.content}
+                    </a>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </Card>
+      )}
+
       {/* Research Report */}
       <Card data-testid="research-report-card">
         <Heading size="5" className="mb-4">
