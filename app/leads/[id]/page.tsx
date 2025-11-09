@@ -203,41 +203,42 @@ export default function LeadDetailPage() {
       </div>
 
       {/* Workflow Timeline */}
-      <Card>
-        <Heading size="5" mb="4">
+      <div className="v2-card" data-testid="workflow-timeline">
+        <h2 className="v2-heading-2 mb-6">
           Workflow Timeline
-        </Heading>
+        </h2>
         <div className="space-y-0">
           {workflowSteps.map((step, index) => (
             <div key={step.id}>
               <button
                 onClick={() => toggleStep(step.id)}
-                className="w-full text-left hover:bg-gray-50 dark:hover:bg-gray-50 p-4 rounded-lg transition-colors"
+                className="w-full text-left hover:bg-gray-50 p-4 transition-colors"
+                data-testid={`workflow-step-${step.id}`}
               >
-                <Flex align="start" gap="4">
+                <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 mt-1">
                     {getStepIcon(step.status)}
                   </div>
                   <div className="flex-1">
-                    <Flex justify="between" align="center" className="mb-2">
-                      <Heading size="3">{step.name}</Heading>
-                      <Badge
-                        color={
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="v2-heading-3">{step.name}</h3>
+                      <span
+                        className={`v2-badge ${
                           step.status === "completed"
-                            ? "green"
+                            ? "v2-badge-success"
                             : step.status === "failed"
-                            ? "red"
+                            ? "v2-badge-danger"
                             : step.status === "in_progress"
-                            ? "blue"
-                            : "gray"
-                        }
+                            ? "v2-badge-warning"
+                            : "v2-badge-default"
+                        }`}
                       >
                         {step.status.replace("_", " ").toUpperCase()}
-                      </Badge>
-                    </Flex>
-                    <Text size="2" color="gray">
+                      </span>
+                    </div>
+                    <p className="v2-text-small">
                       {step.description}
-                    </Text>
+                    </p>
                     
                     {/* Expandable details */}
                     {expandedSteps.has(step.id) && (
