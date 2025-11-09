@@ -592,5 +592,6 @@ export default function ClientsPage() {
         </Table.Root>
       )}
     </Box>
+    </>
   );
 }
