@@ -12,6 +12,8 @@ export const leadRouter = router({
         linkedinSlug: true,
         enrichmentData: true,
         enrichmentStatus: true,
+        lastStep: true,
+        researchResult: true,
         createdAt: true,
         updatedAt: true,
         client: {
