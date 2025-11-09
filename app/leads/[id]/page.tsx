@@ -123,34 +123,29 @@ export default function LeadDetailPage() {
   }
 
   return (
-    <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="v2-container">
       {/* Header */}
-      <Flex
-        align="center"
-        justify="between"
-        className="py-6"
-        wrap="wrap"
-        gap="4"
-      >
+      <div className="flex items-center justify-between py-6 flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
+          <button
             onClick={() => router.push("/leads")}
-            className="cursor-pointer"
+            className="v2-button-secondary flex items-center gap-2"
+            data-testid="back-to-leads-button"
           >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <Image src="/workflow.png" alt="logo" width={80} height={80} />
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+          <div className="flex items-center gap-3">
+            <Image src="/workflow.png" alt="logo" width={64} height={64} />
             <div className="flex flex-col">
-              <Heading size="8">Workflow Details</Heading>
-              <Text size="2" color="gray" className="mt-2">
+              <h1 className="v2-heading-1">Workflow Details</h1>
+              <p className="v2-text-small mt-1">
                 Real-time workflow execution
-              </Text>
+              </p>
             </div>
           </div>
         </div>
-      </Flex>
+      </div>
 
       {/* Lead Info Card */}
       <Card className="mb-6">
