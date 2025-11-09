@@ -92,7 +92,7 @@ Return ONLY the email body (2-3 sentences with the calendar link at the end), no
       // Generate followup outreach subject
       logger.log("Generating followup outreach subject");
       const followupSubjectResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a followup email subject line for ${client.name}. The lead didn't respond to the initial email.
 
 RESEARCH REPORT:
