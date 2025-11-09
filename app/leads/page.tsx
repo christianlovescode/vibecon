@@ -16,6 +16,8 @@ import {
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Navigation from "../components/Navigation";
+import { Workflow } from "lucide-react";
 
 export default function LeadsPage() {
   const router = useRouter();
