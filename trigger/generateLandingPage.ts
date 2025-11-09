@@ -96,41 +96,27 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
         promptLength: v0Prompt.length,
       });
 
-      // Call V0 API to generate the landing page
-      logger.log("Calling V0 API to generate landing page");
+      // Call V0 SDK to generate the landing page
+      logger.log("Calling V0 SDK to generate landing page");
 
       const v0ApiKey = process.env.V0_API_KEY;
       if (!v0ApiKey) {
         throw new Error("V0_API_KEY not found in environment variables");
       }
 
-      const v0Response = await fetch("https://api.v0.dev/v1/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${v0ApiKey}`,
-        },
-        body: JSON.stringify({
-          prompt: v0Prompt,
-          model: "gpt-4o-2024-08-06",
-        }),
+      // Create a new chat with V0 to generate the landing page
+      const chat = await v0.chats.create({
+        message: v0Prompt,
       });
 
-      if (!v0Response.ok) {
-        const errorText = await v0Response.text();
-        logger.error("V0 API call failed", {
-          status: v0Response.status,
-          error: errorText,
-        });
-        throw new Error(`V0 API call failed: ${v0Response.status} - ${errorText}`);
-      }
+      logger.log("V0 chat created successfully", {
+        chatId: chat.id,
+        hasFiles: !!chat.files,
+        fileCount: chat.files?.length || 0,
+      });
 
-      const v0Result = await v0Response.json();
-      logger.log("V0 API response received", { result: v0Result });
-
-      // Extract the URL from V0 response
-      // V0 API returns a URL to the generated page
-      const landingPageUrl = v0Result.url || v0Result.preview_url || "URL not available";
+      // Get the demo URL (this is the deployed/preview URL)
+      const landingPageUrl = chat.demo || `https://v0.dev/chat/${chat.id}`;
 
       logger.log("Landing page generated", { landingPageUrl });
 
