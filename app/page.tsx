@@ -56,13 +56,7 @@ export default function LandingPage() {
 
           <p className="text-base md:text-lg text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-sans">
             Dunbar runs your entire outbound. Warm intros when possible,
-            hyper-relevant cold outreach when needed - all at a fraction of the
-            cost of traditional agency.
-          </p>
-          <p className="text-base md:text-lg text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-sans">
-            Cold emails shouldn&apos;t feel personalized – they should just feel
-            relevant. Show prospects you understand their world without spending
-            hours on research. Start your first campaign today.
+            hyper-relevant cold outreach when needed - all for $999 / month.
           </p>
 
           {/* Email Capture */}
@@ -116,13 +110,13 @@ export default function LandingPage() {
                 style={{ borderRadius: 0 }}
               >
                 <span className="text-xs font-medium text-gray-300">
-                  AI-POWERED WARM INTRODUCTIONS
+                  HOW WE DO IT
                 </span>
               </div>
 
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium text-white font-sans leading-tight">
-                Vibecon&apos;s workflow has added millions in ARR for hundreds
-                of founders.
+                The best personalization doesn&apos;t feel personal at all.{" "}
+                <br /> It just feels relevant.
               </h2>
             </div>
 
@@ -139,28 +133,31 @@ export default function LandingPage() {
                 <div className="border-b border-gray-800 pb-6">
                   <p className="text-sm text-gray-500 mb-2">STEP 2:</p>
                   <p className="text-lg text-gray-200 font-sans">
-                    AI finds and ranks your mutual connections to each prospect
+                    Dunbar checks for warm connections first
                   </p>
                 </div>
 
                 <div className="border-b border-gray-800 pb-6">
                   <p className="text-sm text-gray-500 mb-2">STEP 3:</p>
                   <p className="text-lg text-gray-200 font-sans">
-                    Personalized intro requests generated in your voice
+                    For prospects without connections, AI deeply researches each
+                    one to analyze their pain points and needs
                   </p>
                 </div>
 
                 <div className="border-b border-gray-800 pb-6">
                   <p className="text-sm text-gray-500 mb-2">STEP 4:</p>
                   <p className="text-lg text-gray-200 font-sans">
-                    You review, edit, and approve before anything sends
+                    Generate personalized assets: intro requests, emails,
+                    landing pages, decks, and more - all with copy that&apos;s
+                    tailored specifically to them.
                   </p>
                 </div>
 
                 <div className="pb-6">
                   <p className="text-sm text-gray-500 mb-2">STEP 5:</p>
                   <p className="text-lg text-gray-200 font-sans">
-                    Track which intros convert to meetings and optimize
+                    Review, approve, and launch. Track what converts.
                   </p>
                 </div>
               </div>
@@ -170,7 +167,7 @@ export default function LandingPage() {
       </div>
 
       {/* Pricing */}
-      <section className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-20">
+      <section className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-20 hidden">
         <div className="text-center mb-8 md:mb-12">
           <h2 className="text-3xl md:text-4xl font-medium text-gray-900 mb-3 font-sans">
             Pricing
@@ -301,7 +298,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-gray-50 border-y border-gray-200">
+      <section className="bg-gray-50 border-y border-gray-200 hidden">
         <div className="max-w-3xl mx-auto px-4 md:px-6 py-12 md:py-20">
           <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl md:text-4xl font-medium text-gray-900 mb-3 font-sans">
@@ -393,7 +390,7 @@ export default function LandingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-20 text-center">
+      <section className="max-w-4xl mx-auto px-4 md:px-6 py-12 md:py-20 text-center hidden">
         <h2 className="text-3xl md:text-4xl font-medium text-gray-900 mb-4 font-sans">
           Ready to stop cold emailing?
         </h2>
@@ -413,7 +410,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-600">
-              © 2025 Vibecon. All rights reserved.
+              © 2025 Dunbar. All rights reserved.
             </p>
             <div className="flex gap-4 md:gap-6 text-center">
               <a

@@ -316,13 +316,6 @@ export default function DashboardPage() {
                     </Flex>
                   </Dialog.Content>
                 </Dialog.Root>
-
-                <button
-                  onClick={() => router.push("/clients")}
-                  className="v2-button-secondary"
-                >
-                  View All
-                </button>
               </div>
             </div>
 
