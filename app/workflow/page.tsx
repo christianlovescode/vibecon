@@ -19,6 +19,7 @@ const steps = [
   { id: 1, name: "Client Selection" },
   { id: 2, name: "Asset Selection" },
   { id: 3, name: "Prospect URLs" },
+  { id: 4, name: "Model Selection" },
 ];
 
 export default function WorkflowPage() {
