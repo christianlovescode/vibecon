@@ -56,18 +56,19 @@ export const leadRouter = router({
               clientId,
               linkedinSlug: url, // Store full URL as per user requirement
               enrichmentData: undefined, // null indicates enriching
+              lastStep: null, // Will be set by orchestrator
             },
           });
           return lead;
         })
       );
 
-      // Trigger enrichment tasks for each lead
-      const { enrichLeadTask } = await import("@/trigger/enrichLead");
+      // Trigger orchestrator tasks for each lead
+      const { orchestrateLeadTask } = await import("@/trigger/orchestrateLead");
       
       await Promise.all(
         createdLeads.map(async (lead) => {
-          await tasks.trigger(enrichLeadTask.id, {
+          await tasks.trigger(orchestrateLeadTask.id, {
             leadId: lead.id,
             linkedinUrl: lead.linkedinSlug,
           });
