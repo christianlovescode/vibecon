@@ -20,6 +20,7 @@ import Link from "next/link";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Navigation from "../components/Navigation";
 
 export default function ClientsPage() {
   const router = useRouter();
