@@ -61,7 +61,7 @@ Return ONLY the subject line, nothing else.`,
       // Generate initial outreach body
       logger.log("Generating initial outreach body");
       const initialBodyResponse = await generateText({
-        model: anthropic("claude-sonnet-4-5"),
+        model: anthropic(anthropicModel),
         prompt: `You are writing a cold email body for ${client.name} to reach out to a lead.
 
 RESEARCH REPORT:
