@@ -17,6 +17,8 @@ const LeadStructuredDataSchema = z.object({
   education: z.string().nullable(),
 });
 
+
+
 export const researchLeadTask = task({
   id: "research-lead",
   maxDuration: 600, // 10 minutes for comprehensive research

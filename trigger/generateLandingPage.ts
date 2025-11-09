@@ -8,21 +8,21 @@ import { v0 } from "v0-sdk";
 async function waitForVersion(chatId: string, maxAttempts = 5) {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     logger.log(`Checking for version (attempt ${attempt}/${maxAttempts})`);
-    
+
     const chat = await v0.chats.getById({ chatId });
-    
+
     if (chat.latestVersion?.id) {
       logger.log("Version found", { versionId: chat.latestVersion.id });
       return chat;
     }
-    
+
     if (attempt < maxAttempts) {
       const waitSeconds = attempt * 2; // Exponential backoff: 2s, 4s, 6s, 8s
       logger.log(`Version not ready, waiting ${waitSeconds}s before retry`);
       await wait.for({ seconds: waitSeconds });
     }
   }
-  
+
   throw new Error(
     `Version not ready after ${maxAttempts} attempts. Please try again later.`
   );
@@ -70,9 +70,9 @@ export const generateLandingPageTask = task({
         calSlug = calUrl.pathname.replace(/^\//, "");
         logger.log("Extracted Cal.com slug", { calSlug });
       } catch (error) {
-        logger.warn("Failed to parse calendar URL", { 
+        logger.warn("Failed to parse calendar URL", {
           calendarUrl: client.calendarUrl,
-          error 
+          error,
         });
         // Fallback: try to extract everything after "cal.com/"
         const match = client.calendarUrl.match(/cal\.com\/(.+)/);
@@ -118,6 +118,15 @@ ${
         .join("\n")
     : "No testimonials available"
 }
+
+BRANDING, COLOR, DESIGN STYLE, VISUAL TONE, TONE OF VOICE, AND BRAND PERSONALITY GUIDELINES:
+
+Primary Colors: ${client.primaryColors.join(", ")}
+Secondary Colors: ${client.secondaryColors.join(", ")}
+Design Style: ${client.designStyle}
+Visual Tone: ${client.visualTone}
+Tone of Voice: ${client.toneOfVoice}
+Brand Personality: ${client.brandPersonality.join(", ")}
 
 Write a detailed V0 prompt to CUSTOMIZE the existing template (DO NOT change the structure) that:
 
@@ -231,8 +240,6 @@ Write a comprehensive V0 prompt that will customize this landing page with the p
         chatId: updatedChat.id,
         versionId: latestVersion.id,
       });
-
-      
 
       console.log("DEPLOYMENT RESULT", result);
 
