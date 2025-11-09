@@ -96,23 +96,44 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
         promptLength: v0Prompt.length,
       });
 
-      // Call V0 SDK to generate the landing page
-      logger.log("Calling V0 SDK to generate landing page");
+      // Call V0 SDK to generate the landing page from GitHub template
+      logger.log("Initializing V0 chat from GitHub template");
 
       const v0ApiKey = process.env.V0_API_KEY;
       if (!v0ApiKey) {
         throw new Error("V0_API_KEY not found in environment variables");
       }
 
-      // Create a new chat with V0 to generate the landing page
-      const chatResponse = await v0.chats.create({
+      // Get project ID from environment (optional)
+      const projectId = process.env.V0_PROJECT_ID;
+
+      // Initialize chat from GitHub repository template
+      const chat = await v0.chats.init({
+        type: 'repo',
+        repo: {
+          url: 'https://github.com/christianlovescode/v0-customizable-sales-one-pager',
+          branch: 'main',
+        },
+        projectId: projectId || undefined,
+        name: `Landing Page for ${lead.company || lead.name || 'Lead'}`,
+      });
+
+      logger.log("V0 chat initialized from template", {
+        chatId: chat.id,
+        templateRepo: 'v0-customizable-sales-one-pager',
+      });
+
+      // Send customization message to personalize the template
+      logger.log("Sending customization message to V0");
+      const customizationResponse = await v0.chats.sendMessage({
+        chatId: chat.id,
         message: v0Prompt,
-        responseMode: "sync", // Non-streaming response
+        responseMode: "sync",
       });
 
       // Type assertion since we're using sync mode
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const chat = chatResponse as any;
+      const updatedChat = customizationResponse as any;
 
       logger.log("V0 chat created successfully", {
         chatId: chat.id,
