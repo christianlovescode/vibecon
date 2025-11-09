@@ -14,6 +14,7 @@ import {
 } from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LeadsPage() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
