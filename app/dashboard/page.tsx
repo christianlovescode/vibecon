@@ -10,6 +10,8 @@ import {
   Play,
   Plus,
   Zap,
+  ArrowUpRight,
+  ArrowDownRight,
 } from "lucide-react";
 import {
   Dialog,
@@ -20,7 +22,8 @@ import {
   Text,
   Flex,
 } from "@radix-ui/themes";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { AreaChart, Area, ResponsiveContainer } from "recharts";
 
 import Shell from "@/components/Shell";
 
