@@ -186,7 +186,9 @@ export default function WorkflowsPage() {
   const steps = (workflow?.steps as WorkflowStep[]) || [];
 
   return (
-    <Box className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <Navigation />
+      <Box className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
       <Flex align="center" justify="between" className="py-6" wrap="wrap" gap="4">
         <div>
           <Heading size="8" data-testid="workflows-page-heading">
