@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LeadsPage() {
+  const router = useRouter();
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [linkedinUrls, setLinkedinUrls] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
