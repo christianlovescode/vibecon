@@ -292,6 +292,55 @@ export default function LeadsPage() {
         </div>
       </Card>
 
+      {/* Export Section */}
+      <Card className="mb-6" data-testid="leads-export-card">
+        <Heading size="5" mb="4">
+          Export Leads
+        </Heading>
+
+        <div className="space-y-4">
+          <Box>
+            <Text size="2" weight="medium" className="block mb-2">
+              Select Client <Text color="red">*</Text>
+            </Text>
+            <Select.Root
+              value={exportClientId}
+              onValueChange={setExportClientId}
+              size="2"
+            >
+              <Select.Trigger
+                placeholder="Choose a client to export..."
+                data-testid="export-client-select"
+                className="w-full"
+              />
+              <Select.Content>
+                {clientsData?.clients.map((client) => (
+                  <Select.Item
+                    key={client.id}
+                    value={client.id}
+                    data-testid={`export-client-option-${client.id}`}
+                  >
+                    {client.name}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </Box>
+
+          <Flex gap="3" justify="end">
+            <Button
+              onClick={handleExport}
+              disabled={isExporting || !exportClientId}
+              data-testid="export-leads-button"
+              size="3"
+              variant="outline"
+            >
+              {isExporting ? "Exporting..." : "Export to CSV"}
+            </Button>
+          </Flex>
+        </div>
+      </Card>
+
       {/* Leads Table */}
       <Card data-testid="leads-table-card">
         <Heading size="5" mb="4">
