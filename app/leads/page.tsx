@@ -88,6 +88,8 @@ export default function LeadsPage() {
       await createBulkMutation.mutateAsync({
         clientId: selectedClientId,
         linkedinUrls: urls,
+        generateEmails,
+        generateOnePager,
       });
 
       // Clear form and refetch
