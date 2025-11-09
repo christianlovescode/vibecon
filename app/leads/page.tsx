@@ -14,8 +14,10 @@ import {
 } from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LeadsPage() {
+  const router = useRouter();
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [linkedinUrls, setLinkedinUrls] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,7 +25,7 @@ export default function LeadsPage() {
   // Fetch clients for dropdown
   const { data: clientsData } = trpc.client.list.useQuery();
 
-  // Fetch leads with auto-refresh when enriching
+  // Fetch leads with auto-refresh when processing
   const {
     data: leadsData,
     isLoading,
@@ -31,11 +33,14 @@ export default function LeadsPage() {
     refetch,
   } = trpc.lead.list.useQuery(undefined, {
     refetchInterval: (query) => {
-      // Auto-refetch every 5 seconds if any lead is enriching
-      const hasEnriching = query.state.data?.leads.some(
-        (lead) => lead.enrichmentData === null
+      // Auto-refetch every 5 seconds if any lead is still processing
+      const hasProcessing = query.state.data?.leads.some(
+        (lead) =>
+          !lead.lastStep ||
+          lead.lastStep === "enrichment_started" ||
+          lead.lastStep === "research_started"
       );
-      return hasEnriching ? 5000 : false;
+      return hasProcessing ? 5000 : false;
     },
   });
 
@@ -85,7 +90,9 @@ export default function LeadsPage() {
       // Clear form and refetch
       setLinkedinUrls("");
       refetch();
-      alert(`Successfully queued ${urls.length} lead(s) for enrichment!`);
+      alert(
+        `Successfully queued ${urls.length} lead(s) for enrichment and research!`
+      );
     } catch (err) {
       console.error(err);
       alert("Failed to create leads. Please check the URLs and try again.");
@@ -94,34 +101,59 @@ export default function LeadsPage() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    if (status === "enriching") {
+  const getStatusBadge = (lastStep: string | null) => {
+    if (!lastStep) {
       return (
-        <Badge color="blue" size="1" data-testid="status-enriching">
-          ENRICHING
-        </Badge>
-      );
-    }
-    if (status === "completed") {
-      return (
-        <Badge color="green" size="1" data-testid="status-completed">
-          COMPLETED
-        </Badge>
-      );
-    }
-    if (status === "failed") {
-      return (
-        <Badge color="red" size="1" data-testid="status-failed">
-          FAILED
+        <Badge color="gray" size="1" data-testid="status-pending">
+          PENDING
         </Badge>
       );
     }
 
-    return (
-      <Badge color="green" size="1" data-testid="status-completed">
-        COMPLETED
-      </Badge>
-    );
+    switch (lastStep) {
+      case "enrichment_started":
+        return (
+          <Badge color="blue" size="1" data-testid="status-enriching">
+            ENRICHING
+          </Badge>
+        );
+      case "enrichment_completed":
+        return (
+          <Badge color="cyan" size="1" data-testid="status-enriched">
+            ENRICHED
+          </Badge>
+        );
+      case "enrichment_failed":
+        return (
+          <Badge color="red" size="1" data-testid="status-enrich-failed">
+            ENRICH FAILED
+          </Badge>
+        );
+      case "research_started":
+        return (
+          <Badge color="blue" size="1" data-testid="status-researching">
+            RESEARCHING
+          </Badge>
+        );
+      case "research_completed":
+        return (
+          <Badge color="green" size="1" data-testid="status-completed">
+            COMPLETED
+          </Badge>
+        );
+      case "research_failed":
+        return (
+          <Badge color="red" size="1" data-testid="status-research-failed">
+            RESEARCH FAILED
+          </Badge>
+        );
+      default:
+        return (
+          <Badge color="gray" size="1" data-testid="status-unknown">
+            {lastStep.toUpperCase()}
+          </Badge>
+        );
+    }
   };
 
   return (
@@ -252,7 +284,8 @@ export default function LeadsPage() {
                 <Table.Row
                   key={lead.id}
                   data-testid={`lead-row-${lead.id}`}
-                  className="hover:bg-[var(--muted-bg)] transition-colors"
+                  onClick={() => router.push(`/leads/${lead.id}`)}
+                  className="hover:bg-[var(--accent-3)] transition-colors cursor-pointer"
                 >
                   <Table.Cell>
                     <Text size="2" weight="medium">
@@ -264,15 +297,14 @@ export default function LeadsPage() {
                       href={lead.linkedinSlug}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="text-[var(--accent)] hover:underline"
                       data-testid="lead-linkedin-link"
                     >
                       {lead.linkedinSlug}
                     </a>
                   </Table.Cell>
-                  <Table.Cell>
-                    {getStatusBadge(lead.enrichmentStatus ?? "completed")}
-                  </Table.Cell>
+                  <Table.Cell>{getStatusBadge(lead.lastStep)}</Table.Cell>
                   <Table.Cell>
                     <Text size="2" color="gray">
                       {new Date(lead.createdAt).toLocaleDateString("en-US", {
