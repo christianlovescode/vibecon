@@ -88,7 +88,9 @@ export default function LeadsPage() {
       // Clear form and refetch
       setLinkedinUrls("");
       refetch();
-      alert(`Successfully queued ${urls.length} lead(s) for enrichment and research!`);
+      alert(
+        `Successfully queued ${urls.length} lead(s) for enrichment and research!`
+      );
     } catch (err) {
       console.error(err);
       alert("Failed to create leads. Please check the URLs and try again.");
@@ -298,9 +300,7 @@ export default function LeadsPage() {
                       {lead.linkedinSlug}
                     </a>
                   </Table.Cell>
-                  <Table.Cell>
-                    {getStatusBadge(lead.lastStep)}
-                  </Table.Cell>
+                  <Table.Cell>{getStatusBadge(lead.lastStep)}</Table.Cell>
                   <Table.Cell>
                     <Text size="2" color="gray">
                       {new Date(lead.createdAt).toLocaleDateString("en-US", {

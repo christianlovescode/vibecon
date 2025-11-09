@@ -94,7 +94,7 @@ Extract as much information as possible. If a field is not available, return nul
         }. 
 
 Provide comprehensive information about:
-1. What they do (products/services)
+1. What they do (products, services and features)
 2. Who their customers are (target market and notable clients)
 3. Where they are based (headquarters location)
 4. How big they are (employee count, revenue if available)
@@ -104,7 +104,13 @@ Provide comprehensive information about:
 8. Recent YouTube videos or content
 9. Recent blog posts or thought leadership
 
-Be thorough and detailed in your research.`;
+Be thorough and detailed in your research.
+
+Each one of these should be a separate section in your response.
+
+
+
+`;
 
         const companyResponse = await generateText({
           model: perplexity("sonar-pro"),

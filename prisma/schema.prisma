@@ -97,14 +97,14 @@ model LogoAndBranding {
 }
 
 model Lead {
-  id             String   @id @default(uuid())
-  clientId       String   @map("client_id")
-  linkedinSlug   String   @map("linkedin_slug")
-  enrichmentData Json?    @map("enrichment_data") // Stores unstructured enrichment data as JSON blob
-  lastStep       String?  @map("last_step") // enrichment_started, enrichment_completed, enrichment_failed, research_started, research_completed, research_failed
-  researchResult String?  @db.Text @map("research_result") // Stores the markdown research report
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id               String   @id @default(uuid())
+  clientId         String   @map("client_id")
+  linkedinSlug     String   @map("linkedin_slug")
+  enrichmentData   Json?    @map("enrichment_data") // Stores unstructured enrichment data as JSON blob
+  lastStep         String?  @map("last_step") // enrichment_started, enrichment_completed, enrichment_failed, research_started, research_completed, research_failed
+  researchResult   String?  @map("research_result") @db.Text // Stores the markdown research report
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
   enrichmentStatus String?  @default("completed") @map("enrichment_status") // pending, enriching, completed, failed
 
   client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
