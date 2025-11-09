@@ -16,10 +16,10 @@ import {
 } from "lucide-react";
 
 const steps = [
-  { id: 1, name: "Client Selection" },
-  { id: 2, name: "Asset Selection" },
-  { id: 3, name: "Prospect URLs" },
-  { id: 4, name: "Model Selection" },
+  { id: 1, name: "Client" },
+  { id: 2, name: "Assets" },
+  { id: 3, name: "Prospects" },
+  { id: 4, name: "Model" },
 ];
 
 export default function WorkflowPage() {
@@ -382,21 +382,21 @@ export default function WorkflowPage() {
             <div className="space-y-6">
               <div className="text-center">
                 <h2 className="text-2xl font-semibold mb-2">
-                  Select AI Models
+                  Select Models
                 </h2>
                 <p className="text-gray-500 text-sm">
                   Choose which models to use for research and content generation
                 </p>
               </div>
 
-              <div className="flex items-center justify-center gap-6">
+              <div className="flex flex-col items-center justify-center gap-6">
                 <button
                   onClick={() => setModelTier("production")}
-                  className="hover:scale-105 transition-all duration-300"
+                  className="hover:scale-105 transition-all duration-300 w-full"
                   data-testid="production-model-button"
                 >
                   <div
-                    className="v2-card p-6 w-72"
+                    className="v2-card p-6 w-full"
                     style={{
                       border: modelTier === "production"
                         ? "2px solid rgb(0, 0, 0)"
@@ -419,11 +419,11 @@ export default function WorkflowPage() {
 
                 <button
                   onClick={() => setModelTier("development")}
-                  className="hover:scale-105 transition-all duration-300"
+                  className="hover:scale-105 transition-all duration-300 w-full"
                   data-testid="development-model-button"
                 >
                   <div
-                    className="v2-card p-6 w-72"
+                    className="v2-card p-6 w-full"
                     style={{
                       border: modelTier === "development"
                         ? "2px solid rgb(0, 0, 0)"
