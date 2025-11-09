@@ -85,10 +85,11 @@ export const leadRouter = router({
         linkedinUrls: z.array(z.string().url('Must be valid URLs')).min(1, 'At least one LinkedIn URL is required'),
         generateEmails: z.boolean().optional().default(true),
         generateOnePager: z.boolean().optional().default(true),
+        modelTier: z.enum(['production', 'development']).optional().default('production'),
       })
     )
     .mutation(async ({ input }) => {
-      const { clientId, linkedinUrls, generateEmails, generateOnePager } = input;
+      const { clientId, linkedinUrls, generateEmails, generateOnePager, modelTier } = input;
 
       // Verify client exists
       const client = await db.client.findUnique({
