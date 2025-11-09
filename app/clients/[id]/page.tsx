@@ -18,6 +18,7 @@ import {
 import { useParams, useRouter } from "next/navigation";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
+import Navigation from "../../components/Navigation";
 
 export default function ClientDetailPage() {
   const params = useParams();
