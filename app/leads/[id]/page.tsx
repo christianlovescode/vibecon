@@ -1,15 +1,5 @@
 "use client";
 
-import {
-  Box,
-  Flex,
-  Heading,
-  Text,
-  Card,
-  Badge,
-  Button,
-  Spinner,
-} from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, XCircle, Circle, Loader2 } from "lucide-react";
@@ -51,19 +41,21 @@ export default function LeadDetailPage() {
 
   if (isLoading) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Flex justify="center" align="center" className="min-h-96">
-          <Spinner size="3" />
-        </Flex>
-      </Box>
+      <div className="v2-container">
+        <div className="flex justify-center items-center min-h-96">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      </div>
     );
   }
 
   if (!leadData?.lead) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Text>Lead not found</Text>
-      </Box>
+      <div className="v2-container">
+        <div className="v2-card">
+          <p className="v2-text-body">Lead not found</p>
+        </div>
+      </div>
     );
   }
 
@@ -131,146 +123,143 @@ export default function LeadDetailPage() {
   }
 
   return (
-    <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="v2-container">
       {/* Header */}
-      <Flex
-        align="center"
-        justify="between"
-        className="py-6"
-        wrap="wrap"
-        gap="4"
-      >
+      <div className="flex items-center justify-between py-6 flex-wrap gap-4">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
+          <button
             onClick={() => router.push("/leads")}
-            className="cursor-pointer"
+            className="v2-button-secondary flex items-center gap-2"
+            data-testid="back-to-leads-button"
           >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <Image src="/workflow.png" alt="logo" width={80} height={80} />
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+          <div className="flex items-center gap-3">
+            <Image src="/workflow.png" alt="logo" width={64} height={64} />
             <div className="flex flex-col">
-              <Heading size="8">Workflow Details</Heading>
-              <Text size="2" color="gray" className="mt-2">
+              <h1 className="v2-heading-1">Workflow Details</h1>
+              <p className="v2-text-small mt-1">
                 Real-time workflow execution
-              </Text>
+              </p>
             </div>
           </div>
         </div>
-      </Flex>
+      </div>
 
       {/* Lead Info Card */}
-      <Card className="mb-6">
-        <Heading size="5" mb="4">
+      <div className="v2-card mb-6" data-testid="lead-info-card">
+        <h2 className="v2-heading-2 mb-4">
           Lead Information
-        </Heading>
-        <Flex direction="column" gap="3">
-          <Flex justify="between" align="center">
-            <Text size="2" weight="medium">
+        </h2>
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="v2-text-body font-medium">
               Client:
-            </Text>
-            <Text size="2">{lead.client.name}</Text>
-          </Flex>
-          <Flex justify="between" align="center">
-            <Text size="2" weight="medium">
+            </span>
+            <span className="v2-text-body">{lead.client.name}</span>
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="v2-text-body font-medium">
               LinkedIn:
-            </Text>
+            </span>
             <a
               href={lead.linkedinSlug}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--accent)] hover:underline"
+              className="v2-text-small text-black hover:underline transition-all"
             >
               {lead.linkedinSlug}
             </a>
-          </Flex>
-          <Flex justify="between" align="center">
-            <Text size="2" weight="medium">
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="v2-text-body font-medium">
               Status:
-            </Text>
-            <Badge
-              color={
+            </span>
+            <span
+              className={`v2-badge ${
                 lead.lastStep?.includes("completed")
-                  ? "green"
+                  ? "v2-badge-success"
                   : lead.lastStep?.includes("failed")
-                  ? "red"
-                  : "blue"
-              }
+                  ? "v2-badge-danger"
+                  : "v2-badge-default"
+              }`}
+              data-testid="lead-status-badge"
             >
               {lead.lastStep || "PENDING"}
-            </Badge>
-          </Flex>
+            </span>
+          </div>
           {lead.triggerRunId && (
-            <Flex justify="between" align="center">
-              <Text size="2" weight="medium">
+            <div className="flex justify-between items-center py-2">
+              <span className="v2-text-body font-medium">
                 Run ID:
-              </Text>
-              <Text size="1" className="font-mono text-gray-500">
+              </span>
+              <span className="v2-text-small font-mono text-gray-500">
                 {lead.triggerRunId}
-              </Text>
-            </Flex>
+              </span>
+            </div>
           )}
-        </Flex>
-      </Card>
+        </div>
+      </div>
 
       {/* Workflow Timeline */}
-      <Card>
-        <Heading size="5" mb="4">
+      <div className="v2-card" data-testid="workflow-timeline">
+        <h2 className="v2-heading-2 mb-6">
           Workflow Timeline
-        </Heading>
+        </h2>
         <div className="space-y-0">
           {workflowSteps.map((step, index) => (
             <div key={step.id}>
               <button
                 onClick={() => toggleStep(step.id)}
-                className="w-full text-left hover:bg-gray-50 dark:hover:bg-gray-50 p-4 rounded-lg transition-colors"
+                className="w-full text-left hover:bg-gray-50 p-4 transition-colors"
+                data-testid={`workflow-step-${step.id}`}
               >
-                <Flex align="start" gap="4">
+                <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 mt-1">
                     {getStepIcon(step.status)}
                   </div>
                   <div className="flex-1">
-                    <Flex justify="between" align="center" className="mb-2">
-                      <Heading size="3">{step.name}</Heading>
-                      <Badge
-                        color={
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="v2-heading-3">{step.name}</h3>
+                      <span
+                        className={`v2-badge ${
                           step.status === "completed"
-                            ? "green"
+                            ? "v2-badge-success"
                             : step.status === "failed"
-                            ? "red"
+                            ? "v2-badge-danger"
                             : step.status === "in_progress"
-                            ? "blue"
-                            : "gray"
-                        }
+                            ? "v2-badge-warning"
+                            : "v2-badge-default"
+                        }`}
                       >
                         {step.status.replace("_", " ").toUpperCase()}
-                      </Badge>
-                    </Flex>
-                    <Text size="2" color="gray">
+                      </span>
+                    </div>
+                    <p className="v2-text-small">
                       {step.description}
-                    </Text>
+                    </p>
                     
                     {/* Expandable details */}
                     {expandedSteps.has(step.id) && (
-                      <Box className="mt-4 p-4 bg-gray-50 dark:bg-gray-50 rounded-md">
-                        <Text size="2" weight="medium" className="mb-2">
+                      <div className="mt-4 p-4 bg-gray-50 border border-gray-200">
+                        <p className="v2-text-body font-medium mb-3">
                           Step Details
-                        </Text>
-                        <div className="space-y-2">
+                        </p>
+                        <div className="space-y-3">
                           {step.status === "in_progress" && (
-                            <Text size="2" color="gray">
+                            <p className="v2-text-small">
                               This step is currently executing...
-                            </Text>
+                            </p>
                           )}
                           {step.status === "completed" && step.id === "enrichment" && lead.enrichmentData && (
-                            <pre className="text-xs overflow-auto max-h-64 bg-black text-white  p-2 rounded">
+                            <pre className="text-xs overflow-auto max-h-64 bg-black text-white p-3 border border-gray-300">
                               {JSON.stringify(lead.enrichmentData, null, 2)}
                             </pre>
                           )}
                           {step.status === "completed" && step.id === "research" && lead.researchResult && (
-                            <div className="prose prose-sm max-w-none dark:prose-invert">
-                              <Text size="2">{lead.researchResult.substring(0, 500)}...</Text>
+                            <div className="prose prose-sm max-w-none">
+                              <p className="v2-text-small">{lead.researchResult.substring(0, 500)}...</p>
                             </div>
                           )}
                           {step.status === "completed" && step.id === "emails" && (
@@ -278,29 +267,29 @@ export default function LeadDetailPage() {
                               {lead.assets
                                 ?.filter((asset) => asset.type === "message")
                                 .map((asset) => (
-                                  <Box
+                                  <div
                                     key={asset.id}
-                                    className="p-4 bg-white dark:bg-gray-950 rounded-md border border-gray-200 dark:border-gray-800"
+                                    className="v2-card bg-white"
                                   >
-                                    <Flex justify="between" align="center" className="mb-2">
-                                      <Text size="2" weight="bold">
+                                    <div className="flex justify-between items-center mb-3">
+                                      <span className="v2-text-body font-bold">
                                         {asset.name}
-                                      </Text>
-                                      <Badge color="blue" size="1">
+                                      </span>
+                                      <span className="v2-badge v2-badge-default">
                                         Email
-                                      </Badge>
-                                    </Flex>
-                                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                                      <pre className="whitespace-pre-wrap text-sm bg-gray-50 dark:bg-gray-900 p-3 rounded">
+                                      </span>
+                                    </div>
+                                    <div className="prose prose-sm max-w-none">
+                                      <pre className="whitespace-pre-wrap text-sm bg-gray-50 p-3 border border-gray-200">
                                         {asset.content}
                                       </pre>
                                     </div>
-                                  </Box>
+                                  </div>
                                 ))}
                               {(!lead.assets || lead.assets.filter((a) => a.type === "message").length === 0) && (
-                                <Text size="2" color="gray">
+                                <p className="v2-text-small">
                                   No emails generated yet
-                                </Text>
+                                </p>
                               )}
                             </div>
                           )}
@@ -309,30 +298,30 @@ export default function LeadDetailPage() {
                               {lead.assets
                                 ?.filter((asset) => asset.type === "landing_page")
                                 .map((asset) => (
-                                  <Box
+                                  <div
                                     key={asset.id}
-                                    className="bg-white dark:bg-gray-950 rounded-md border border-gray-200 dark:border-gray-800"
+                                    className="v2-card bg-white"
                                   >
-                                    <Flex justify="between" align="center" className="p-3 border-b border-gray-200 dark:border-gray-800">
-                                      <Text size="2" weight="bold">
+                                    <div className="flex justify-between items-center p-3 border-b border-gray-200">
+                                      <span className="v2-text-body font-bold">
                                         {asset.name}
-                                      </Text>
-                                      <Flex gap="2" align="center">
-                                        <Badge color="purple" size="1">
+                                      </span>
+                                      <div className="flex gap-3 items-center">
+                                        <span className="v2-badge v2-badge-default">
                                           Landing Page
-                                        </Badge>
+                                        </span>
                                         <a
                                           href={asset.content}
                                           target="_blank"
                                           rel="noopener noreferrer"
-                                          className="text-[var(--accent)] hover:underline text-sm"
+                                          className="v2-text-small text-black hover:underline"
                                         >
                                           Open in new tab ↗
                                         </a>
-                                      </Flex>
-                                    </Flex>
+                                      </div>
+                                    </div>
                                     <div className="p-2">
-                                      <div className="relative w-full rounded overflow-hidden border border-gray-200 dark:border-gray-700">
+                                      <div className="relative w-full overflow-hidden border border-gray-200">
                                         <div className="aspect-[16/10] w-full">
                                           <iframe
                                             src={asset.content}
@@ -343,65 +332,65 @@ export default function LeadDetailPage() {
                                         </div>
                                       </div>
                                     </div>
-                                  </Box>
+                                  </div>
                                 ))}
                               {(!lead.assets || lead.assets.filter((a) => a.type === "landing_page").length === 0) && (
-                                <Text size="2" color="gray">
+                                <p className="v2-text-small">
                                   No landing pages generated yet
-                                </Text>
+                                </p>
                               )}
                             </div>
                           )}
                           {step.status === "failed" && (
-                            <Text size="2" color="red">
+                            <p className="v2-text-small text-red-500">
                               This step failed. Please try again.
-                            </Text>
+                            </p>
                           )}
                           {step.status === "pending" && (
-                            <Text size="2" color="gray">
+                            <p className="v2-text-small">
                               Waiting for previous steps to complete...
-                            </Text>
+                            </p>
                           )}
                         </div>
-                      </Box>
+                      </div>
                     )}
                   </div>
-                </Flex>
+                </div>
               </button>
               {index < workflowSteps.length - 1 && (
-                <div className="ml-7 h-8 w-0.5 bg-gray-200 dark:bg-gray-700" />
+                <div className="ml-7 h-8 w-0.5 bg-gray-200" />
               )}
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Assets */}
       {lead.assets && lead.assets.length > 0 && (
-        <Card className="mt-6">
-          <Heading size="5" mb="4">
+        <div className="v2-card mt-6" data-testid="generated-assets">
+          <h2 className="v2-heading-2 mb-4">
             Generated Assets
-          </Heading>
+          </h2>
           <div className="space-y-3">
             {lead.assets.map((asset) => (
-              <Box key={asset.id} className="p-3 bg-gray-50 rounded-md">
-                <Flex justify="between" align="center">
+              <div key={asset.id} className="p-4 bg-gray-50 border border-gray-200 hover:shadow-md transition-all">
+                <div className="flex justify-between items-center">
                   <div>
-                    <Text size="2" weight="medium">
+                    <p className="v2-text-body font-medium">
                       {asset.name}
-                    </Text>
-                    <Text size="1" color="gray">
+                    </p>
+                    <p className="v2-text-small">
                       {asset.type}
-                    </Text>
+                    </p>
                   </div>
-                  <Badge>{asset.type}</Badge>
-                </Flex>
-              </Box>
+                  <span className="v2-badge v2-badge-default">{asset.type}</span>
+                </div>
+              </div>
             ))}
           </div>
-        </Card>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
 
