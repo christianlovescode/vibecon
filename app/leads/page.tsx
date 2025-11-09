@@ -214,7 +214,9 @@ export default function LeadsPage() {
   };
 
   return (
-    <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <Navigation />
+      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <Flex
         align="center"
         justify="between"
@@ -230,6 +232,14 @@ export default function LeadsPage() {
             Upload and enrich LinkedIn leads
           </Text>
         </div>
+        <Button
+          variant="soft"
+          size="3"
+          onClick={() => router.push('/workflows')}
+        >
+          <Workflow className="w-4 h-4" />
+          View Workflow
+        </Button>
       </Flex>
 
       {/* Upload Section */}
