@@ -367,30 +367,30 @@ export default function LeadDetailPage() {
 
       {/* Assets */}
       {lead.assets && lead.assets.length > 0 && (
-        <Card className="mt-6">
-          <Heading size="5" mb="4">
+        <div className="v2-card mt-6" data-testid="generated-assets">
+          <h2 className="v2-heading-2 mb-4">
             Generated Assets
-          </Heading>
+          </h2>
           <div className="space-y-3">
             {lead.assets.map((asset) => (
-              <Box key={asset.id} className="p-3 bg-gray-50 rounded-md">
-                <Flex justify="between" align="center">
+              <div key={asset.id} className="p-4 bg-gray-50 border border-gray-200 hover:shadow-md transition-all">
+                <div className="flex justify-between items-center">
                   <div>
-                    <Text size="2" weight="medium">
+                    <p className="v2-text-body font-medium">
                       {asset.name}
-                    </Text>
-                    <Text size="1" color="gray">
+                    </p>
+                    <p className="v2-text-small">
                       {asset.type}
-                    </Text>
+                    </p>
                   </div>
-                  <Badge>{asset.type}</Badge>
-                </Flex>
-              </Box>
+                  <span className="v2-badge v2-badge-default">{asset.type}</span>
+                </div>
+              </div>
             ))}
           </div>
-        </Card>
+        </div>
       )}
-    </Box>
+    </div>
   );
 }
 
