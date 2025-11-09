@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 /**
  * Singleton instance of PrismaClient to prevent multiple connections in development
