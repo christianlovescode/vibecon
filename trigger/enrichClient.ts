@@ -420,7 +420,9 @@ Provide a detailed analysis based on the actual language and style used.`
             • Features/Services: ${companyData.object.features.length}<br/>
             • Testimonials: ${companyData.object.testimonials.length}<br/>
             • Branding Assets: ${brandingData.object.brandingAssets.length}<br/>
-            • Marketing Materials: ${marketingData.object.marketingMaterials.length}
+            • Marketing Materials: ${marketingData.object.marketingMaterials.length}<br/>
+            • Brand Colors: ${(visualAnalysis?.object.primaryColors.length || 0) + (visualAnalysis?.object.secondaryColors.length || 0)}<br/>
+            • Brand Analysis: ${visualAnalysis && textAnalysis ? 'Complete' : 'Incomplete'}
           </p>
         `,
       });
