@@ -88,7 +88,7 @@ export default function LeadsPage() {
       // Clear form and refetch
       setLinkedinUrls("");
       refetch();
-      alert(`Successfully queued ${urls.length} lead(s) for enrichment!`);
+      alert(`Successfully queued ${urls.length} lead(s) for enrichment and research!`);
     } catch (err) {
       console.error(err);
       alert("Failed to create leads. Please check the URLs and try again.");
