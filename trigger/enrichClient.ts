@@ -61,6 +61,19 @@ const MarketingResearchSchema = z.object({
   marketingMaterials: z.array(MarketingMaterialSchema),
 });
 
+const VisualAnalysisSchema = z.object({
+  primaryColors: z.array(z.string()).describe("Array of primary brand colors in hex format"),
+  secondaryColors: z.array(z.string()).describe("Array of secondary/accent colors in hex format"),
+  designStyle: z.string().describe("Overall design style (e.g., minimal, corporate, playful, modern, traditional)"),
+  layoutType: z.string().describe("Homepage layout structure (e.g., hero-centered, grid-based, single-column)"),
+  visualTone: z.string().describe("Overall visual impression and mood"),
+});
+
+const TextAnalysisSchema = z.object({
+  toneOfVoice: z.string().describe("Writing style and communication tone"),
+  brandPersonality: z.array(z.string()).describe("Key brand personality traits"),
+});
+
 export const enrichClientTask = task({
   id: "enrich-client",
   maxDuration: 600, // 10 minutes for comprehensive research
