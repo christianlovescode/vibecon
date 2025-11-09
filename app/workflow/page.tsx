@@ -105,6 +105,7 @@ export default function WorkflowPage() {
         linkedinUrls: urls,
         generateEmails,
         generateOnePager,
+        modelTier,
       });
 
       // Clear form
