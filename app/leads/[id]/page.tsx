@@ -41,19 +41,21 @@ export default function LeadDetailPage() {
 
   if (isLoading) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Flex justify="center" align="center" className="min-h-96">
-          <Spinner size="3" />
-        </Flex>
-      </Box>
+      <div className="v2-container">
+        <div className="flex justify-center items-center min-h-96">
+          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+        </div>
+      </div>
     );
   }
 
   if (!leadData?.lead) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Text>Lead not found</Text>
-      </Box>
+      <div className="v2-container">
+        <div className="v2-card">
+          <p className="v2-text-body">Lead not found</p>
+        </div>
+      </div>
     );
   }
 
