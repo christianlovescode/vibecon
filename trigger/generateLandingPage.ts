@@ -1,8 +1,32 @@
-import { logger, task } from "@trigger.dev/sdk/v3";
+import { logger, task, wait } from "@trigger.dev/sdk/v3";
 import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import db from "@/db/client";
 import { v0 } from "v0-sdk";
+
+// Helper function to wait for version to be ready
+async function waitForVersion(chatId: string, maxAttempts = 5) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    logger.log(`Checking for version (attempt ${attempt}/${maxAttempts})`);
+    
+    const chat = await v0.chats.getById({ chatId });
+    
+    if (chat.latestVersion?.id) {
+      logger.log("Version found", { versionId: chat.latestVersion.id });
+      return chat;
+    }
+    
+    if (attempt < maxAttempts) {
+      const waitSeconds = attempt * 2; // Exponential backoff: 2s, 4s, 6s, 8s
+      logger.log(`Version not ready, waiting ${waitSeconds}s before retry`);
+      await wait.for({ seconds: waitSeconds });
+    }
+  }
+  
+  throw new Error(
+    `Version not ready after ${maxAttempts} attempts. Please try again later.`
+  );
+}
 
 export const generateLandingPageTask = task({
   id: "generate-landing-page",
@@ -96,44 +120,91 @@ Write a comprehensive V0 prompt that will generate this landing page. Be specifi
         promptLength: v0Prompt.length,
       });
 
-      // Call V0 SDK to generate the landing page
-      logger.log("Calling V0 SDK to generate landing page");
+      // Call V0 SDK to generate the landing page from GitHub template
+      logger.log("Initializing V0 chat from GitHub template");
 
       const v0ApiKey = process.env.V0_API_KEY;
       if (!v0ApiKey) {
         throw new Error("V0_API_KEY not found in environment variables");
       }
 
-      // Create a new chat with V0 to generate the landing page
-      const chatResponse = await v0.chats.create({
+      // Get project ID from environment (optional)
+      const projectId = process.env.V0_PROJECT_ID;
+
+      // Initialize chat from GitHub repository template
+      const chat = await v0.chats.init({
+        type: "repo",
+        repo: {
+          url: "https://github.com/christianlovescode/v0-customizable-sales-one-pager",
+          branch: "main",
+        },
+        projectId: projectId || undefined,
+        name: `Landing Page for ${lead.linkedinSlug ?? "Lead"}`,
+      });
+
+      logger.log("V0 chat initialized from template", {
+        chatId: chat.id,
+        templateRepo: "v0-customizable-sales-one-pager",
+      });
+
+      // Send customization message to personalize the template
+      logger.log("Sending customization message to V0");
+      const customizationResponse = await v0.chats.sendMessage({
+        chatId: chat.id,
         message: v0Prompt,
-        responseMode: "sync", // Non-streaming response
+        responseMode: "sync",
       });
 
       // Type assertion since we're using sync mode
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const chat = chatResponse as any;
+      const messageResponse = customizationResponse as any;
 
-      logger.log("V0 chat created successfully", {
-        chatId: chat.id,
-        url: chat.url,
-        hasVersion: !!chat.version,
-        versionStatus: chat.version?.status,
+      logger.log("V0 message sent", {
+        chatId: messageResponse.id,
+        hasVersion: !!messageResponse.latestVersion,
       });
+
+      // Wait for the version to be ready with retry logic
+      logger.log("Waiting for version to be ready");
+      const updatedChat = await waitForVersion(chat.id);
+
+      logger.log("V0 chat version ready", {
+        chatId: updatedChat.id,
+        url: updatedChat.webUrl,
+        versionId: updatedChat.latestVersion?.id,
+        versionStatus: updatedChat.latestVersion?.status,
+      });
+
+      // Validate projectId is available
+      if (!updatedChat.projectId) {
+        throw new Error(
+          "Project ID not available in chat response. Cannot create deployment."
+        );
+      }
+
+      // At this point, latestVersion is guaranteed to exist (waitForVersion ensures this)
+      const latestVersion = updatedChat.latestVersion!;
 
       // Get the preview URL from the version or fallback to chat URL
       const landingPageUrl =
-        chat.version?.previewUrl ||
-        chat.url ||
-        `https://v0.dev/chat/${chat.id}`;
+        latestVersion.demoUrl ||
+        updatedChat.webUrl ||
+        `https://v0.dev/chat/${updatedChat.id}`;
 
-      // publish the landign page
+      // Create deployment - version and projectId are guaranteed to exist at this point
+      logger.log("Creating deployment", {
+        projectId: updatedChat.projectId,
+        chatId: updatedChat.id,
+        versionId: latestVersion.id,
+      });
 
       const result = await v0.deployments.create({
-        projectId: chat.projectId,
-        chatId: chat.id,
-        versionId: chat.version?.id,
+        projectId: updatedChat.projectId,
+        chatId: updatedChat.id,
+        versionId: latestVersion.id,
       });
+
+      
 
       console.log("DEPLOYMENT RESULT", result);
 
