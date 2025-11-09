@@ -21,6 +21,8 @@ import { trpc } from "@/trpc/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import Image from "next/image";
+
 export default function ClientsPage() {
   const router = useRouter();
   const { data, isLoading, error, refetch } = trpc.client.list.useQuery(
@@ -166,12 +168,17 @@ export default function ClientsPage() {
         gap="4"
       >
         <div>
-          <Heading size="8" data-testid="clients-page-heading">
-            Clients
-          </Heading>
-          <Text size="2" color="gray" className="mt-2">
-            Manage your client relationships and information
-          </Text>
+          <div className="flex items-center gap-2">
+            <Image src="/customer.png" alt="logo" width={100} height={100} />
+            <div className="flex flex-col">
+              <Heading size="8" data-testid="clients-page-heading">
+                Clients
+              </Heading>
+              <Text size="2" color="gray" className="mt-2">
+                Manage your client relationships and information
+              </Text>
+            </div>
+          </div>
         </div>
         <Flex gap="3" className="w-full sm:w-auto">
           <div className="flex-1 sm:flex-initial sm:w-64">
@@ -282,6 +289,7 @@ export default function ClientsPage() {
                 data-testid="create-client-button"
                 size="2"
                 variant="classic"
+                radius="full"
               >
                 + New Client
               </Button>
@@ -483,7 +491,11 @@ export default function ClientsPage() {
                 </Dialog.Close>
                 <Button
                   onClick={handleCreate}
-                  disabled={!formData.name || !formData.calendarUrl || createMutation.isPending}
+                  disabled={
+                    !formData.name ||
+                    !formData.calendarUrl ||
+                    createMutation.isPending
+                  }
                   data-testid="create-submit-button"
                 >
                   {createMutation.isPending ? "Creating..." : "Create Client"}

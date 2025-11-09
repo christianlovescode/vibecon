@@ -16,6 +16,7 @@ import {
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function LeadsPage() {
   const router = useRouter();
@@ -76,14 +77,16 @@ export default function LeadsPage() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      
+
       // Get client name for filename
       const selectedClient = clientsData?.clients.find(
         (c) => c.id === exportClientId
       );
-      const clientName = selectedClient?.name.replace(/[^a-z0-9]/gi, "_").toLowerCase() || "client";
+      const clientName =
+        selectedClient?.name.replace(/[^a-z0-9]/gi, "_").toLowerCase() ||
+        "client";
       const timestamp = new Date().toISOString().split("T")[0];
-      
+
       link.download = `${clientName}_leads_${timestamp}.csv`;
       document.body.appendChild(link);
       link.click();
@@ -220,13 +223,16 @@ export default function LeadsPage() {
         wrap="wrap"
         gap="4"
       >
-        <div>
-          <Heading size="8" data-testid="leads-page-heading">
-            Leads
-          </Heading>
-          <Text size="2" color="gray" className="mt-2">
-            Upload and enrich LinkedIn leads
-          </Text>
+        <div className="flex items-center gap-2">
+          <Image src="/workflow.png" alt="logo" width={100} height={100} />
+          <div className="flex flex-col">
+            <Heading size="8" data-testid="clients-page-heading">
+              Workflow
+            </Heading>
+            <Text size="2" color="gray" className="mt-2">
+              Manage your workflow and leads
+            </Text>
+          </div>
         </div>
       </Flex>
 
@@ -292,7 +298,9 @@ export default function LeadsPage() {
                 <Checkbox
                   data-testid="generate-emails-checkbox"
                   checked={generateEmails}
-                  onCheckedChange={(checked) => setGenerateEmails(checked === true)}
+                  onCheckedChange={(checked) =>
+                    setGenerateEmails(checked === true)
+                  }
                 />
                 <Text size="2">Generate Emails</Text>
               </label>
@@ -300,7 +308,9 @@ export default function LeadsPage() {
                 <Checkbox
                   data-testid="generate-onepager-checkbox"
                   checked={generateOnePager}
-                  onCheckedChange={(checked) => setGenerateOnePager(checked === true)}
+                  onCheckedChange={(checked) =>
+                    setGenerateOnePager(checked === true)
+                  }
                 />
                 <Text size="2">Generate One Pager</Text>
               </label>
@@ -435,8 +445,12 @@ export default function LeadsPage() {
                   </Table.Cell>
                   <Table.Cell>{getStatusBadge(lead.lastStep)}</Table.Cell>
                   <Table.Cell>
-                    <Badge color={lead._count.assets > 0 ? "green" : "gray"} size="1">
-                      {lead._count.assets} asset{lead._count.assets !== 1 ? "s" : ""}
+                    <Badge
+                      color={lead._count.assets > 0 ? "green" : "gray"}
+                      size="1"
+                    >
+                      {lead._count.assets} asset
+                      {lead._count.assets !== 1 ? "s" : ""}
                     </Badge>
                   </Table.Cell>
                   <Table.Cell>
