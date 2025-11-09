@@ -21,6 +21,8 @@ export default function LeadsPage() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [linkedinUrls, setLinkedinUrls] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [exportClientId, setExportClientId] = useState<string>("");
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch clients for dropdown
   const { data: clientsData } = trpc.client.list.useQuery();
