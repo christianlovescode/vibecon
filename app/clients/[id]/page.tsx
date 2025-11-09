@@ -215,20 +215,26 @@ export default function ClientDetailPage() {
 
   if (isLoading) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Text color="gray">Loading client...</Text>
-      </Box>
+      <>
+        <Navigation />
+        <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <Text color="gray">Loading client...</Text>
+        </Box>
+      </>
     );
   }
 
   if (error) {
     return (
-      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <Text color="red">Error: {error.message}</Text>
-        <Button onClick={() => router.push("/clients")} className="mt-4">
-          Back to Clients
-        </Button>
-      </Box>
+      <>
+        <Navigation />
+        <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+          <Text color="red">Error: {error.message}</Text>
+          <Button onClick={() => router.push("/clients")} className="mt-4">
+            Back to Clients
+          </Button>
+        </Box>
+      </>
     );
   }
 
@@ -237,7 +243,9 @@ export default function ClientDetailPage() {
   }
 
   return (
-    <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <Navigation />
+      <Box className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
       <Flex
         align="center"
         justify="between"
