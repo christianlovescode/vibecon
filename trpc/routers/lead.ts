@@ -30,6 +30,29 @@ export const leadRouter = router({
     return { leads };
   }),
 
+  // Get individual lead by ID
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input }) => {
+      const lead = await db.lead.findUnique({
+        where: { id: input.id },
+        include: {
+          client: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      });
+
+      if (!lead) {
+        throw new Error('Lead not found');
+      }
+
+      return { lead };
+    }),
+
   // Create multiple leads from CSV input
   createBulk: publicProcedure
     .input(

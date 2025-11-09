@@ -14,8 +14,10 @@ import {
 } from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LeadsPage() {
+  const router = useRouter();
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [linkedinUrls, setLinkedinUrls] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -282,7 +284,8 @@ export default function LeadsPage() {
                 <Table.Row
                   key={lead.id}
                   data-testid={`lead-row-${lead.id}`}
-                  className="hover:bg-[var(--muted-bg)] transition-colors"
+                  onClick={() => router.push(`/leads/${lead.id}`)}
+                  className="hover:bg-[var(--accent-3)] transition-colors cursor-pointer"
                 >
                   <Table.Cell>
                     <Text size="2" weight="medium">
@@ -294,6 +297,7 @@ export default function LeadsPage() {
                       href={lead.linkedinSlug}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="text-[var(--accent)] hover:underline"
                       data-testid="lead-linkedin-link"
                     >
