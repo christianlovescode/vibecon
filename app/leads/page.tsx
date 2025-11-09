@@ -48,6 +48,53 @@ export default function LeadsPage() {
 
   const createBulkMutation = trpc.lead.createBulk.useMutation();
 
+  const handleExport = async () => {
+    if (!exportClientId) {
+      alert("Please select a client to export");
+      return;
+    }
+
+    setIsExporting(true);
+
+    try {
+      const result = await trpc.lead.exportByClient.query({
+        clientId: exportClientId,
+      });
+
+      if (result.count === 0) {
+        alert("No leads found for this client");
+        setIsExporting(false);
+        return;
+      }
+
+      // Create blob and download
+      const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      
+      // Get client name for filename
+      const selectedClient = clientsData?.clients.find(
+        (c) => c.id === exportClientId
+      );
+      const clientName = selectedClient?.name.replace(/[^a-z0-9]/gi, "_").toLowerCase() || "client";
+      const timestamp = new Date().toISOString().split("T")[0];
+      
+      link.download = `${clientName}_leads_${timestamp}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      alert(`Successfully exported ${result.count} lead(s)!`);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to export leads. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedClientId) {
       alert("Please select a client");
