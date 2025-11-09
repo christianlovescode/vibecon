@@ -242,9 +242,9 @@ Click on the lead to view:
 **Landing Page Generation Strategy:**
 - First uses Claude to create a comprehensive V0 prompt
 - Prompt includes lead's pain points + client's solutions
-- V0 API generates a full Next.js landing page
-- Page is automatically deployed by V0
-- URL is returned and stored as asset content
+- V0 SDK creates a chat and generates a full Next.js landing page
+- V0 automatically provides a demo/preview URL
+- URL is stored as asset content for the customer to use
 
 **Performance:**
 - Email generation: ~30-60 seconds for all 4 assets
