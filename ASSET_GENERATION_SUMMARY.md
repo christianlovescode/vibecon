@@ -73,10 +73,11 @@ assets LeadAsset[]
 **Asset name created:**
 - `landing_page_url`
 
-**V0 API Configuration:**
-- Endpoint: `https://api.v0.dev/v1/generate`
+**V0 SDK Configuration:**
+- Uses `v0-sdk` npm package
 - API Key: Stored in `.env.local` as `V0_API_KEY`
-- Model: `gpt-4o-2024-08-06`
+- Creates a chat with V0 and returns the demo URL
+- Returns both deployable code files and live preview URL
 
 ### 4. Updated Orchestration (`/app/trigger/orchestrateLead.ts`)
 
