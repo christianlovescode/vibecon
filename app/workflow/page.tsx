@@ -30,6 +30,7 @@ export default function WorkflowPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generateEmails, setGenerateEmails] = useState<boolean>(false);
   const [generateOnePager, setGenerateOnePager] = useState<boolean>(false);
+  const [modelTier, setModelTier] = useState<"production" | "development">("production");
 
   // Fetch clients for dropdown
   const { data: clientsData } = trpc.client.list.useQuery();
