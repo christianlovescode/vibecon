@@ -233,6 +233,30 @@ export default function LeadsPage() {
             />
           </Box>
 
+          <Box>
+            <Text size="2" weight="medium" className="block mb-3">
+              Assets to Generate
+            </Text>
+            <Flex direction="column" gap="2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  data-testid="generate-emails-checkbox"
+                  checked={generateEmails}
+                  onCheckedChange={(checked) => setGenerateEmails(checked === true)}
+                />
+                <Text size="2">Generate Emails</Text>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  data-testid="generate-onepager-checkbox"
+                  checked={generateOnePager}
+                  onCheckedChange={(checked) => setGenerateOnePager(checked === true)}
+                />
+                <Text size="2">Generate One Pager</Text>
+              </label>
+            </Flex>
+          </Box>
+
           <Flex gap="3" justify="end">
             <Button
               onClick={handleSubmit}
