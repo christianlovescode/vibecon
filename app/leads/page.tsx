@@ -299,7 +299,7 @@ export default function LeadsPage() {
                     </a>
                   </Table.Cell>
                   <Table.Cell>
-                    {getStatusBadge(lead.enrichmentStatus ?? "completed")}
+                    {getStatusBadge(lead.lastStep)}
                   </Table.Cell>
                   <Table.Cell>
                     <Text size="2" color="gray">
