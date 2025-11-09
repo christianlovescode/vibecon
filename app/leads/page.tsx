@@ -469,5 +469,6 @@ export default function LeadsPage() {
         )}
       </Card>
     </Box>
+    </>
   );
 }
