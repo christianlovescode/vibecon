@@ -74,10 +74,11 @@ assets LeadAsset[]
 - `landing_page_url`
 
 **V0 SDK Configuration:**
-- Uses `v0-sdk` npm package
+- Uses `v0-sdk` npm package (v0.15.0)
 - API Key: Stored in `.env.local` as `V0_API_KEY`
-- Creates a chat with V0 and returns the demo URL
-- Returns both deployable code files and live preview URL
+- Creates a chat with V0 using `responseMode: "sync"` for non-streaming
+- Returns `ChatDetail` with preview URL, code files, and chat metadata
+- Stores the preview URL for customers to use in outreach
 
 ### 4. Updated Orchestration (`/app/trigger/orchestrateLead.ts`)
 
