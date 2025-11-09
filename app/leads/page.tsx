@@ -11,6 +11,7 @@ import {
   TextArea,
   Select,
   Badge,
+  Checkbox,
 } from "@radix-ui/themes";
 import { trpc } from "@/trpc/client";
 import { useState } from "react";
@@ -21,6 +22,8 @@ export default function LeadsPage() {
   const [selectedClientId, setSelectedClientId] = useState<string>("");
   const [linkedinUrls, setLinkedinUrls] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generateEmails, setGenerateEmails] = useState<boolean>(true);
+  const [generateOnePager, setGenerateOnePager] = useState<boolean>(true);
   const [exportClientId, setExportClientId] = useState<string>("");
   const [isExporting, setIsExporting] = useState(false);
 
@@ -135,6 +138,8 @@ export default function LeadsPage() {
       await createBulkMutation.mutateAsync({
         clientId: selectedClientId,
         linkedinUrls: urls,
+        generateEmails,
+        generateOnePager,
       });
 
       // Clear form and refetch
@@ -276,6 +281,30 @@ export default function LeadsPage() {
               rows={8}
               className="font-mono text-sm"
             />
+          </Box>
+
+          <Box>
+            <Text size="2" weight="medium" className="block mb-3">
+              Assets to Generate
+            </Text>
+            <Flex direction="column" gap="2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  data-testid="generate-emails-checkbox"
+                  checked={generateEmails}
+                  onCheckedChange={(checked) => setGenerateEmails(checked === true)}
+                />
+                <Text size="2">Generate Emails</Text>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox
+                  data-testid="generate-onepager-checkbox"
+                  checked={generateOnePager}
+                  onCheckedChange={(checked) => setGenerateOnePager(checked === true)}
+                />
+                <Text size="2">Generate One Pager</Text>
+              </label>
+            </Flex>
           </Box>
 
           <Flex gap="3" justify="end">
