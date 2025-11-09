@@ -30,6 +30,8 @@ export const orchestrateLeadTask = task({
 
       let enrichmentRan = false;
       let researchRan = false;
+      let emailsGenerated = false;
+      let landingPageGenerated = false;
 
       // STEP 1: Check if we need to run enrichment
       let currentStatus = await fetchLastStatus();
